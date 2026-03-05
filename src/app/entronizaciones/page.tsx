@@ -2,7 +2,7 @@ import { getEntronizaciones } from "@/lib/content";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
 import { SurfaceCard } from "@/components/SurfaceCard";
-import Image from "next/image";
+import { ImageGallery } from "@/components/ImageGallery";
 
 export const revalidate = 300;
 
@@ -51,23 +51,7 @@ export default async function EntronizacionesPage() {
                   <p className="mt-3 text-primary-600/90">{item.descripcion}</p>
 
                   {item.imagenes.length > 0 ? (
-                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      {item.imagenes.map((imagePath) => (
-                        <div
-                          key={`${item.slug}-${imagePath}`}
-                          className="relative h-48 w-full overflow-hidden rounded-xl"
-                        >
-                          <Image
-                            src={encodeURI(imagePath)}
-                            alt={`Entronización en ${item.lugar}`}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 640px) 100vw, 50vw"
-                            unoptimized
-                          />
-                        </div>
-                      ))}
-                    </div>
+                    <ImageGallery images={item.imagenes} lugar={item.lugar} slug={item.slug} />
                   ) : null}
                 </SurfaceCard>
               ))}
