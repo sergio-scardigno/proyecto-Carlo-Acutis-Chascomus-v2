@@ -1,65 +1,156 @@
-import Image from "next/image";
+import { HeroParallax } from "@/components/HeroParallax";
+import { Section } from "@/components/Section";
+import Link from "next/link";
+import { getNovedades } from "@/lib/content";
 
-export default function Home() {
+function formatDate(value: string) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("es-AR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+export default async function Home() {
+  let novedades: Awaited<ReturnType<typeof getNovedades>> = [];
+  try {
+    novedades = (await getNovedades()).slice(0, 4);
+  } catch {
+    novedades = [];
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="font-sans">
+      <HeroParallax
+        title="Proyecto Carlo Acutis"
+        subtitle="Una página moderna con parallax multicapa, secciones claras y navegación simple."
+        layers={[
+          {
+            src: "/parallax/catedral.png",
+            speed: 0.12,
+            opacity: 1,
+            size: "cover",
+            position: "center",
+            className: "",
+          },
+          {
+            src: "/parallax/arbustos.png",
+            speed: 0.24,
+            opacity: 1,
+            size: "cover",
+            position: "center 100%",
+            className: "",
+          },
+          {
+            src: "/parallax/carlos-acutis.png",
+            speed: 0.38,
+            opacity: 1,
+            size: "contain",
+            position: "55% 100%",
+            className: "",
+          },
+        ]}
+        mobileLayers={[
+          {
+            src: "/parallax/movil/catedral.png",
+            speed: 0.18,
+            opacity: 1,
+            size: "cover",
+            position: "center",
+          },
+          {
+            src: "/parallax/movil/arbustos.png",
+            speed: 0.35,
+            opacity: 1,
+            size: "cover",
+            position: "center 95%",
+          },
+          {
+            src: "/parallax/movil/carlos-acutis.png",
+            speed: 0.55,
+            opacity: 1,
+            size: "cover",
+            position: "center 98%",
+          },
+        ]}
+        ctaText="Conocer más"
+        scrollToId="sections"
+      />
+      <div id="sections" className="page-shell">
+        <div className="page-content grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
+          <div>
+            <Section
+              id="sobre"
+              title="Sobre el proyecto"
+              description="Inspirado en el Beato Carlo Acutis, compartimos recursos, devociones y contenidos que impulsan la vida de fe."
+              background="subtle"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <Card title="Novena" desc="Reza la novena de Carlo Acutis." href="/novena" />
+                <Card title="Novedades" desc="Artículos y reflexiones." href="/blog" />
+                <Card title="Entronizaciones" desc="Guía y testimonios." href="/entronizaciones" />
+              </div>
+            </Section>
+            <Section
+              title="Multimedia y contacto"
+              description="Explora videos y ponte en contacto con nosotros."
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <Card title="Videos" desc="Colección de videos." href="/videos" />
+                <Card title="Contacto" desc="Escríbenos para más información." href="/contacto" />
+              </div>
+            </Section>
+          </div>
+
+          <aside className="lg:sticky lg:top-28 lg:self-start">
+            <div className="surface-card rounded-2xl p-5">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-base font-semibold text-primary-700">Últimas novedades</h2>
+                <Link href="/blog" className="text-xs font-semibold text-primary-600 hover:text-primary-700">
+                  Ver todas
+                </Link>
+              </div>
+
+              {novedades.length === 0 ? (
+                <p className="mt-4 text-sm text-primary-600/80">
+                  Pronto publicaremos nuevas novedades.
+                </p>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  {novedades.map((item) => (
+                    <Link
+                      key={item.id}
+                      href="/blog"
+                      className="block rounded-xl border border-primary-600/15 bg-white/90 p-3 transition hover:bg-primary-500/5"
+                    >
+                      <p className="line-clamp-2 text-sm font-semibold text-primary-700">{item.titulo}</p>
+                      {item.fecha ? (
+                        <p className="mt-1 text-xs text-primary-600/70">{formatDate(item.fecha)}</p>
+                      ) : null}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </aside>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
+  );
+}
+
+type CardProps = { title: string; desc: string; href: string };
+function Card({ title, desc, href }: CardProps) {
+  return (
+    <Link
+      href={href}
+      className="surface-card block rounded-2xl p-6 transition hover:-translate-y-0.5 hover:bg-primary-500/5 hover:shadow-lg hover:shadow-primary-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+    >
+      <h3 className="text-lg font-semibold text-primary-700">{title}</h3>
+      <p className="mt-2 text-sm text-primary-600/85">{desc}</p>
+    </Link>
   );
 }
