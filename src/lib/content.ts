@@ -28,7 +28,7 @@ const DIRECTUS_BASE_URL = process.env.DIRECTUS_BASE_URL ?? "";
 const DIRECTUS_API_TOKEN = process.env.DIRECTUS_API_TOKEN ?? "";
 const DIRECTUS_NOVEDADES_ENDPOINT =
   process.env.DIRECTUS_NOVEDADES_ENDPOINT ??
-  "/items/novedades?filter[status][_eq]=published&sort=-date_created";
+  "/items/novedades?filter[status][_eq]=published&sort=-id";
 const DIRECTUS_ENTRONIZACIONES_ENDPOINT =
   process.env.DIRECTUS_ENTRONIZACIONES_ENDPOINT ??
   "/items/entronizaciones?fields=*,imagenes.*&filter[status][_eq]=published&sort=-date_created";
@@ -133,7 +133,12 @@ function extractImageUrls(raw: unknown): string[] {
 
   return items
     .map((item) => {
-      if (typeof item === "string") return normalizeCmsUrl(item);
+      if (typeof item === "string") {
+        if (item.startsWith("http://") || item.startsWith("https://") || item.startsWith("/")) {
+          return normalizeCmsUrl(item);
+        }
+        return buildDirectusAssetUrl(item);
+      }
 
       if (typeof item === "number") {
         return buildDirectusAssetUrl(item);
@@ -244,12 +249,10 @@ async function getEntronizacionesFromDirectus(): Promise<Entronizacion[]> {
 }
 
 export async function getNovedades() {
-  if (CONTENT_SOURCE === "directus") return getNovedadesFromDirectus();
-  return getNovedadesFromCsv();
+  return getNovedadesFromDirectus();
 }
 
 export async function getEntronizaciones() {
-  if (CONTENT_SOURCE === "directus") return getEntronizacionesFromDirectus();
-  return getEntronizacionesFromCsv();
+  return getEntronizacionesFromDirectus();
 }
 

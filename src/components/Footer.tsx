@@ -1,9 +1,17 @@
+import Image from "next/image";
+
 export function Footer() {
 	return (
 		<footer className="border-t border-primary-700/20 bg-primary-700 text-blue-100">
 			<div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
 				<div>
-					<h3 className="text-lg font-semibold text-white">Proyecto Carlo Acutis</h3>
+					<Image
+						src="/img/logo/logo.png"
+						alt="Proyecto Carlo Acutis"
+						width={400}
+						height={400}
+						className="h-28 w-auto object-contain"
+					/>
 					<p className="mt-3 text-sm leading-relaxed text-blue-100/90">
 						Espacio de evangelización y encuentro para compartir devociones, testimonios y
 						recursos inspirados en la vida de Carlo Acutis.

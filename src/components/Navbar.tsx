@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
@@ -36,16 +37,14 @@ export function Navbar() {
 
 	return (
 		<header
-			className={`${
-				isHome
-					? "absolute top-0 left-0 right-0 z-50 bg-transparent"
-					: "sticky top-0 z-50 w-full border-b border-primary-700/10 bg-surface/95 backdrop-blur-md"
-			}`}
+			className={`${isHome
+				? "absolute top-0 left-0 right-0 z-50 bg-transparent"
+				: "sticky top-0 z-50 w-full border-b border-primary-700/10 bg-surface/95 backdrop-blur-md"
+				}`}
 		>
 			<div
-				className={`${
-					isHome ? "bg-black/35 text-white backdrop-blur-[2px]" : "bg-primary-700 text-white"
-				}`}
+				className={`${isHome ? "bg-black/35 text-white backdrop-blur-[2px]" : "bg-primary-700 text-white"
+					}`}
 			>
 				<div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-xs md:text-sm">
 					<p className="font-medium tracking-wide">Comunidad Carlo Acutis Argentina</p>
@@ -66,11 +65,16 @@ export function Navbar() {
 			<div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:py-4">
 				<Link
 					href="/"
-					className={`hidden text-sm font-semibold md:inline-block ${
-						isHome ? "text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" : "text-primary-700"
-					}`}
+					className="flex items-center"
 				>
-					Proyecto Carlo Acutis
+					<Image
+						src="/img/logo/logo.png"
+						alt="Proyecto Carlo Acutis"
+						width={400}
+						height={400}
+						className="h-20 w-auto object-contain"
+						priority
+					/>
 				</Link>
 				<button
 					type="button"
@@ -108,13 +112,12 @@ export function Navbar() {
 						<Link
 							key={item.href}
 							href={item.href}
-							className={`rounded-full px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${
-								item.active
-									? "bg-primary-500 text-white shadow shadow-primary-500/40"
-									: isHome
+							className={`rounded-full px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${item.active
+								? "bg-primary-500 text-white shadow shadow-primary-500/40"
+								: isHome
 									? "text-white/95 hover:bg-black/20 drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)]"
 									: "text-primary-700 hover:bg-primary-500/10"
-							}`}
+								}`}
 						>
 							{item.label}
 						</Link>
@@ -122,11 +125,10 @@ export function Navbar() {
 				</nav>
 				<div
 					id="mobile-nav"
-					className={`absolute top-full mt-2 w-[calc(100vw-2.5rem)] max-w-sm -translate-x-1/2 origin-top overflow-hidden rounded-2xl border p-3 transition-all duration-200 ease-out md:hidden ${mobileMenuClass} ${
-						mobileOpen
-							? "pointer-events-auto opacity-100 backdrop-blur-md"
-							: "pointer-events-none -translate-y-2 scale-95 opacity-0"
-					}`}
+					className={`absolute top-full mt-2 w-[calc(100vw-2.5rem)] max-w-sm -translate-x-1/2 origin-top overflow-hidden rounded-2xl border p-3 transition-all duration-200 ease-out md:hidden ${mobileMenuClass} ${mobileOpen
+						? "pointer-events-auto opacity-100 backdrop-blur-md"
+						: "pointer-events-none -translate-y-2 scale-95 opacity-0"
+						}`}
 					style={{ left: "50%" }}
 				>
 					<nav className="flex flex-col gap-1.5">
@@ -135,9 +137,8 @@ export function Navbar() {
 								key={item.href}
 								href={item.href}
 								onClick={() => setMobileOpen(false)}
-								className={`rounded-xl px-3 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-									item.active ? "bg-primary-500/25" : "hover:bg-primary-500/15"
-								}`}
+								className={`rounded-xl px-3 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${item.active ? "bg-primary-500/25" : "hover:bg-primary-500/15"
+									}`}
 							>
 								{item.label}
 							</Link>

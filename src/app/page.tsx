@@ -1,27 +1,9 @@
 import { HeroParallax } from "@/components/HeroParallax";
 import { Section } from "@/components/Section";
 import Link from "next/link";
-import { getNovedades } from "@/lib/content";
-
-function formatDate(value: string) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("es-AR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-}
+import { NovedadesSidebar } from "@/components/NovedadesSidebar";
 
 export default async function Home() {
-  let novedades: Awaited<ReturnType<typeof getNovedades>> = [];
-  try {
-    novedades = (await getNovedades()).slice(0, 4);
-  } catch {
-    novedades = [];
-  }
-
   return (
     <main className="font-sans">
       <HeroParallax
@@ -105,37 +87,7 @@ export default async function Home() {
             </Section>
           </div>
 
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="surface-card rounded-2xl p-5">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-base font-semibold text-primary-700">Últimas novedades</h2>
-                <Link href="/blog" className="text-xs font-semibold text-primary-600 hover:text-primary-700">
-                  Ver todas
-                </Link>
-              </div>
-
-              {novedades.length === 0 ? (
-                <p className="mt-4 text-sm text-primary-600/80">
-                  Pronto publicaremos nuevas novedades.
-                </p>
-              ) : (
-                <div className="mt-4 space-y-3">
-                  {novedades.map((item) => (
-                    <Link
-                      key={item.id}
-                      href="/blog"
-                      className="block rounded-xl border border-primary-600/15 bg-white/90 p-3 transition hover:bg-primary-500/5"
-                    >
-                      <p className="line-clamp-2 text-sm font-semibold text-primary-700">{item.titulo}</p>
-                      {item.fecha ? (
-                        <p className="mt-1 text-xs text-primary-600/70">{formatDate(item.fecha)}</p>
-                      ) : null}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          </aside>
+          <NovedadesSidebar />
         </div>
       </div>
     </main>
