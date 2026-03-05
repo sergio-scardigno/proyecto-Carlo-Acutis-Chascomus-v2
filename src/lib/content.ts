@@ -31,7 +31,7 @@ const DIRECTUS_NOVEDADES_ENDPOINT =
   "/items/novedades?filter[status][_eq]=published&sort=-date_created";
 const DIRECTUS_ENTRONIZACIONES_ENDPOINT =
   process.env.DIRECTUS_ENTRONIZACIONES_ENDPOINT ??
-  "/items/entronizaciones?filter[status][_eq]=published&sort=-date_created";
+  "/items/entronizaciones?fields=*,imagenes.*&filter[status][_eq]=published&sort=-date_created";
 type JsonObject = Record<string, unknown>;
 
 async function readProjectCsv(relativePath: string) {
@@ -97,6 +97,11 @@ function normalizeCmsUrl(url: string) {
   return url;
 }
 
+function buildDirectusAssetUrl(assetId: string | number) {
+  if (!assetId) return "";
+  return DIRECTUS_BASE_URL ? `${DIRECTUS_BASE_URL}/assets/${encodeURIComponent(String(assetId))}` : "";
+}
+
 async function fetchDirectusJson(endpoint: string) {
   if (!DIRECTUS_BASE_URL) {
     throw new Error("Falta DIRECTUS_BASE_URL para consumir contenido de Directus.");
@@ -131,7 +136,7 @@ function extractImageUrls(raw: unknown): string[] {
       if (typeof item === "string") return normalizeCmsUrl(item);
 
       if (typeof item === "number") {
-        return DIRECTUS_BASE_URL ? `${DIRECTUS_BASE_URL}/assets/${item}` : "";
+        return buildDirectusAssetUrl(item);
       }
 
       if (typeof item !== "object" || item === null) return "";
@@ -142,14 +147,14 @@ function extractImageUrls(raw: unknown): string[] {
 
       const directusFile = record.directus_files_id;
       if (typeof directusFile === "string" || typeof directusFile === "number") {
-        return DIRECTUS_BASE_URL ? `${DIRECTUS_BASE_URL}/assets/${directusFile}` : "";
+        return buildDirectusAssetUrl(directusFile);
       }
 
       if (typeof directusFile === "object" && directusFile !== null) {
         const directusFileRecord = directusFile as JsonObject;
         if (typeof directusFileRecord.url === "string") return normalizeCmsUrl(directusFileRecord.url);
         if (typeof directusFileRecord.id === "string" || typeof directusFileRecord.id === "number") {
-          return DIRECTUS_BASE_URL ? `${DIRECTUS_BASE_URL}/assets/${directusFileRecord.id}` : "";
+          return buildDirectusAssetUrl(directusFileRecord.id);
         }
       }
 
