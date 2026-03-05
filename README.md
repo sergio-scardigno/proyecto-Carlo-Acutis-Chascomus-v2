@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Proyecto Carlo Acutis Chascomús v2
 
-## Getting Started
+Esta es una plataforma web desarrollada con [Next.js](https://nextjs.org) dedicada a la comunidad de Carlo Acutis en Chascomús. El sitio proporciona información sobre novedades (blog), videos, novenas y detalles sobre las entronizaciones de las reliquias.
 
-First, run the development server:
+## Características del Proyecto
+
+- **Framework**: Next.js 16 (App Router) con Turbopack.
+- **Lenguaje**: TypeScript.
+- **Estilos**: Tailwind CSS 4 con `@tailwindcss/postcss`.
+- **Estructura**:
+    - `src/app`: Rutas y páginas de la aplicación.
+    - `src/components`: Componentes de UI reutilizables.
+    - `src/lib`: Lógica de negocio y servicios de datos.
+    - `data`: Almacenamiento local para contenido en formato CSV.
+
+## Gestión de Contenido
+
+El proyecto utiliza un sistema dual de fuentes de contenido configurado en `src/lib/content.ts`:
+1. **Directus**: Si se configuran las variables de entorno `DIRECTUS_BASE_URL` y `DIRECTUS_API_TOKEN`, el sitio consumirá datos dinámicos desde un CMS Directus.
+2. **CSV**: Como fallback o para desarrollo sencillo, utiliza archivos `.csv` en la carpeta `data/`.
+
+## Comenzando
+
+Para ejecutar el servidor de desarrollo:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver el resultado.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cómo Actualizar
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Para mantener el proyecto al día con las últimas versiones de Next.js y sus dependencias críticas, sigue estos pasos:
 
-## Learn More
+1. **Ejecutar la actualización**:
+   ```bash
+   npm install next@latest react@latest react-dom@latest eslint-config-next@latest
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Verificar estabilidad**:
+   Siempre ejecuta el build para asegurar que no hay errores de tipado o cambios disruptivos:
+   ```bash
+   npm run build
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Verificar calidad de código**:
+   ```bash
+   npm run lint
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Despliegue
 
-## Deploy on Vercel
+La forma más sencilla de desplegar es usando la [Plataforma Vercel](https://vercel.com/new). Asegúrate de configurar las variables de entorno necesarias (`DIRECTUS_*`) si vas a usar el CMS externo.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
