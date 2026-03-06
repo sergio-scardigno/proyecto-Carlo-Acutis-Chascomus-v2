@@ -2,8 +2,20 @@ import { HeroParallax } from "@/components/HeroParallax";
 import { Section } from "@/components/Section";
 import Link from "next/link";
 import { NovedadesSidebar } from "@/components/NovedadesSidebar";
+import { getVideos, type Video } from "@/lib/content";
+import { FeaturedVideoCard } from "@/components/FeaturedVideoCard";
+import { ContactForm } from "@/components/ContactForm";
 
 export default async function Home() {
+  let featuredVideo: Video | null = null;
+
+  try {
+    const videos = await getVideos();
+    featuredVideo = videos[0] ?? null;
+  } catch {
+    featuredVideo = null;
+  }
+
   return (
     <main className="font-sans">
       <HeroParallax
@@ -81,8 +93,12 @@ export default async function Home() {
               description="Explora videos y ponte en contacto con nosotros."
             >
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <Card title="Videos" desc="Colección de videos." href="/videos" />
-                <Card title="Contacto" desc="Escríbenos para más información." href="/contacto" />
+                {featuredVideo ? (
+                  <FeaturedVideoCard video={featuredVideo} />
+                ) : (
+                  <Card title="Videos" desc="Colección de videos." href="/videos" />
+                )}
+                <ContactForm />
               </div>
             </Section>
           </div>

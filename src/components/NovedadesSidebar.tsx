@@ -12,6 +12,13 @@ function formatDate(value: string) {
     }).format(date);
 }
 
+function getShortExcerpt(item: Novedad, maxLength = 80) {
+    const sourceText = (item.resumen || item.contenido || "").replace(/\s+/g, " ").trim();
+    if (!sourceText) return "";
+    if (sourceText.length <= maxLength) return sourceText;
+    return `${sourceText.slice(0, maxLength)}...`;
+}
+
 export async function NovedadesSidebar() {
     let novedades: Novedad[] = [];
     try {
@@ -55,6 +62,11 @@ export async function NovedadesSidebar() {
                                     <p className="line-clamp-2 text-[15px] font-semibold text-primary-700 leading-snug group-hover:text-primary-800 transition-colors">
                                         {item.titulo}
                                     </p>
+                                    {getShortExcerpt(item) ? (
+                                        <p className="text-xs text-primary-600/85">
+                                            {getShortExcerpt(item)}
+                                        </p>
+                                    ) : null}
                                     {item.fecha ? (
                                         <div className="flex items-center gap-1.5 opacity-60">
                                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
