@@ -10,6 +10,9 @@ export type Novedad = {
   contenido: string;
   fecha: string;
   imagen: string;
+  imagenes: string[];
+  youtubeUrl: string;
+  youtubeEmbedUrl: string;
   publicado: boolean;
 };
 
@@ -33,22 +36,38 @@ export type Video = {
   publicado: boolean;
 };
 
+export type Testimonio = {
+  id: number;
+  slug: string;
+  titulo: string;
+  descripcion: string;
+  youtubeUrl: string;
+  youtubeEmbedUrl: string;
+  thumbnailUrl: string;
+  publicado: boolean;
+};
+
 const CONTENT_SOURCE = process.env.CONTENT_SOURCE ?? (process.env.DIRECTUS_BASE_URL ? "directus" : "csv");
 const DIRECTUS_BASE_URL = process.env.DIRECTUS_BASE_URL ?? "";
 const DIRECTUS_API_TOKEN = process.env.DIRECTUS_API_TOKEN ?? "";
 const DIRECTUS_NOVEDADES_ENDPOINT =
   process.env.DIRECTUS_NOVEDADES_ENDPOINT ??
-  "/items/novedades?filter[status][_eq]=published&sort=-id";
+  "/items/novedades?fields=*,imagenes.*&filter[status][_eq]=published&sort=-id";
 const DIRECTUS_ENTRONIZACIONES_ENDPOINT =
   process.env.DIRECTUS_ENTRONIZACIONES_ENDPOINT ??
-  "/items/entronizaciones?fields=*,imagenes.*&filter[status][_eq]=published&sort=-date_created";
+  "/items/entronizaciones?fields=*,imagenes.*&filter[status][_eq]=published&sort=-id";
 const DIRECTUS_VIDEOS_ENDPOINT =
   process.env.DIRECTUS_VIDEOS_ENDPOINT ??
-  "/items/videos?filter[status][_eq]=published&sort=-date_created";
-const DIRECTUS_NOVEDADES_FALLBACK_ENDPOINT = "/items/novedades?filter[status][_eq]=published&sort=-id";
+  "/items/videos?filter[status][_eq]=published&sort=-id";
+const DIRECTUS_TESTIMONIOS_ENDPOINT =
+  process.env.DIRECTUS_TESTIMONIOS_ENDPOINT ??
+  "/items/testimonios?filter[status][_eq]=published&sort=-id";
+const DIRECTUS_NOVEDADES_FALLBACK_ENDPOINT =
+  "/items/novedades?fields=*,imagenes.*&filter[status][_eq]=published&sort=-id";
 const DIRECTUS_ENTRONIZACIONES_FALLBACK_ENDPOINT =
   "/items/entronizaciones?fields=*,imagenes.*&filter[status][_eq]=published&sort=-id";
 const DIRECTUS_VIDEOS_FALLBACK_ENDPOINT = "/items/videos?filter[status][_eq]=published&sort=-id";
+const DIRECTUS_TESTIMONIOS_FALLBACK_ENDPOINT = "/items/testimonios?filter[status][_eq]=published&sort=-id";
 type JsonObject = Record<string, unknown>;
 
 async function readProjectCsv(relativePath: string) {
@@ -137,6 +156,10 @@ function buildYoutubeThumbnailUrl(videoId: string) {
 }
 
 function normalizeNovedad(row: Record<string, string>): Novedad {
+  const youtubeUrl = row.youtube_url ?? row.youtubeUrl ?? row.url_video ?? "";
+  const videoId = extractYoutubeVideoId(youtubeUrl);
+  const imagenes = splitImages(row.imagenes ?? row.imagen ?? "");
+
   return {
     id: Number(row.id) || 0,
     slug: row.slug ?? "",
@@ -144,7 +167,10 @@ function normalizeNovedad(row: Record<string, string>): Novedad {
     resumen: row.resumen ?? "",
     contenido: row.contenido ?? "",
     fecha: row.fecha ?? "",
-    imagen: row.imagen ?? "",
+    imagen: row.imagen ?? imagenes[0] ?? "",
+    imagenes,
+    youtubeUrl,
+    youtubeEmbedUrl: buildYoutubeEmbedUrl(videoId),
     publicado: toBoolean(row.publicado ?? "false"),
   };
 }
@@ -173,6 +199,15 @@ function buildDirectusAssetUrl(assetId: string | number) {
   return DIRECTUS_BASE_URL ? `${DIRECTUS_BASE_URL}/assets/${encodeURIComponent(String(assetId))}` : "";
 }
 
+function isUsableImageUrl(url: string) {
+  if (!url) return false;
+  const normalized = url.trim();
+  if (!normalized) return false;
+  // Evita URLs incompletas tipo /assets/? que rompen la portada.
+  if (normalized.endsWith("/assets/?") || normalized.endsWith("/assets/")) return false;
+  return true;
+}
+
 async function fetchDirectusJson(endpoint: string) {
   if (!DIRECTUS_BASE_URL) {
     throw new Error("Falta DIRECTUS_BASE_URL para consumir contenido de Directus.");
@@ -193,11 +228,11 @@ async function fetchDirectusJson(endpoint: string) {
   return (await response.json()) as JsonObject;
 }
 
-function isDateCreatedForbiddenError(error: unknown) {
+function isForbiddenSortFieldError(error: unknown) {
   return (
     error instanceof Error &&
     error.message.includes("Error Directus 403") &&
-    error.message.toLowerCase().includes("date_created")
+    error.message.toLowerCase().includes("access field")
   );
 }
 
@@ -205,7 +240,7 @@ async function fetchDirectusJsonWithDateFallback(primaryEndpoint: string, fallba
   try {
     return await fetchDirectusJson(primaryEndpoint);
   } catch (error) {
-    if (primaryEndpoint !== fallbackEndpoint && isDateCreatedForbiddenError(error)) {
+    if (primaryEndpoint !== fallbackEndpoint && isForbiddenSortFieldError(error)) {
       return fetchDirectusJson(fallbackEndpoint);
     }
     throw error;
@@ -239,6 +274,8 @@ function extractImageUrls(raw: unknown): string[] {
 
       if (typeof record.url === "string") return normalizeCmsUrl(record.url);
       if (typeof record.imagen === "string") return normalizeCmsUrl(record.imagen);
+      if (typeof record.imagen_url === "string") return normalizeCmsUrl(record.imagen_url);
+      if (typeof record.thumbnail === "string") return normalizeCmsUrl(record.thumbnail);
 
       const directusFile = record.directus_files_id;
       if (typeof directusFile === "string" || typeof directusFile === "number") {
@@ -253,9 +290,33 @@ function extractImageUrls(raw: unknown): string[] {
         }
       }
 
+      const imageLikeKeys = [
+        "imagenes_id",
+        "imagen_id",
+        "file",
+        "file_id",
+        "files_id",
+        "asset",
+        "asset_id",
+      ];
+
+      for (const key of imageLikeKeys) {
+        const value = record[key];
+        if (typeof value === "string" || typeof value === "number") {
+          return buildDirectusAssetUrl(value);
+        }
+        if (typeof value === "object" && value !== null) {
+          const nested = value as JsonObject;
+          if (typeof nested.url === "string") return normalizeCmsUrl(nested.url);
+          if (typeof nested.id === "string" || typeof nested.id === "number") {
+            return buildDirectusAssetUrl(nested.id);
+          }
+        }
+      }
+
       return "";
     })
-    .filter(Boolean);
+    .filter(isUsableImageUrl);
 }
 
 async function getNovedadesFromCsv(): Promise<Novedad[]> {
@@ -277,12 +338,18 @@ async function getNovedadesFromDirectus(): Promise<Novedad[]> {
 
   return entries.map((entry) => {
     const safeEntry = typeof entry === "object" && entry !== null ? (entry as JsonObject) : {};
-    const imageUrl =
-      extractImageUrls(safeEntry.imagen)[0] ??
-      extractImageUrls(safeEntry.imagenes)[0] ??
-      extractImageUrls(safeEntry.portada)[0] ??
-      "";
-    const titulo = toStringValue(safeEntry.titulo) || toStringValue(safeEntry.title);
+    const entryId = Number(safeEntry.id ?? 0);
+    const coverImage = extractImageUrls(safeEntry.imagen)[0] ?? "";
+    const galleryImages = extractImageUrls(safeEntry.imagenes);
+    const galleryImage = galleryImages[0] ?? "";
+    const portadaImage = extractImageUrls(safeEntry.portada)[0] ?? "";
+    const imageUrls = Array.from(new Set([coverImage, ...galleryImages, portadaImage].filter(Boolean)));
+    const imageUrl = imageUrls[0] ?? galleryImage;
+    const titulo =
+      toStringValue(safeEntry.titulo) ||
+      toStringValue(safeEntry.title) ||
+      toStringValue(safeEntry.nombre) ||
+      `Novedad ${entryId || "sin título"}`;
     const resumen = toStringValue(safeEntry.resumen) || toStringValue(safeEntry.excerpt);
     const contenido =
       toStringValue(safeEntry.contenido) ||
@@ -293,19 +360,36 @@ async function getNovedadesFromDirectus(): Promise<Novedad[]> {
       toStringValue(safeEntry.date_created) ||
       toStringValue(safeEntry.date_updated);
     const slug = buildSlug(toStringValue(safeEntry.slug), titulo || contenido || `novedad-${safeEntry.id ?? 0}`);
+    const youtubeUrl = pickStringValue(safeEntry, [
+      "youtubeUrl",
+      "youtube_url",
+      "youtube",
+      "youtubeVideoUrl",
+      "youtube_video_url",
+      "urlYoutube",
+      "url_youtube",
+      "videoUrl",
+      "video_url",
+      "url_video",
+      "url",
+    ]);
+    const videoId = extractYoutubeVideoId(youtubeUrl);
     const publicado =
       typeof safeEntry.publicado === "boolean"
         ? safeEntry.publicado
         : toStringValue(safeEntry.status) === "published";
 
     return {
-      id: Number(safeEntry.id ?? 0),
+      id: entryId,
       slug,
       titulo,
       resumen,
       contenido,
       fecha,
       imagen: imageUrl,
+      imagenes: imageUrls,
+      youtubeUrl,
+      youtubeEmbedUrl: buildYoutubeEmbedUrl(videoId),
       publicado,
     };
   }).filter((item) => item.publicado);
@@ -383,6 +467,52 @@ async function getVideosFromDirectus(): Promise<Video[]> {
     .filter((item) => item.publicado && item.youtubeEmbedUrl);
 }
 
+async function getTestimoniosFromDirectus(): Promise<Testimonio[]> {
+  const payload = await fetchDirectusJsonWithDateFallback(
+    DIRECTUS_TESTIMONIOS_ENDPOINT,
+    DIRECTUS_TESTIMONIOS_FALLBACK_ENDPOINT,
+  );
+  const entries = readDataEntries(payload);
+
+  return entries
+    .map((entry) => {
+      const safeEntry = typeof entry === "object" && entry !== null ? (entry as JsonObject) : {};
+      const titulo = pickStringValue(safeEntry, ["titulo", "title", "nombre"]);
+      const descripcion = pickStringValue(safeEntry, ["descripcion", "texto", "resumen", "content"]);
+      const youtubeUrl = pickStringValue(safeEntry, [
+        "youtubeUrl",
+        "youtube_url",
+        "enlaceYoutube",
+        "enlace_youtube",
+        "enlace",
+        "url",
+        "url_video",
+        "videoUrl",
+        "video_url",
+      ]);
+      const videoId = extractYoutubeVideoId(youtubeUrl);
+      const status = toStringValue(safeEntry.status).toLowerCase();
+      const publicado =
+        typeof safeEntry.publicado === "boolean"
+          ? safeEntry.publicado
+          : status
+            ? status === "published"
+            : true;
+
+      return {
+        id: Number(safeEntry.id ?? 0),
+        slug: buildSlug(toStringValue(safeEntry.slug), titulo || `testimonio-${safeEntry.id ?? 0}`),
+        titulo,
+        descripcion,
+        youtubeUrl,
+        youtubeEmbedUrl: buildYoutubeEmbedUrl(videoId),
+        thumbnailUrl: buildYoutubeThumbnailUrl(videoId),
+        publicado,
+      };
+    })
+    .filter((item) => item.publicado && item.youtubeEmbedUrl);
+}
+
 async function fetchDirectusVideosPayload() {
   const candidates = Array.from(
     new Set([
@@ -421,5 +551,10 @@ export async function getEntronizaciones() {
 export async function getVideos() {
   if (CONTENT_SOURCE === "csv") return [];
   return getVideosFromDirectus();
+}
+
+export async function getTestimonios() {
+  if (CONTENT_SOURCE === "csv") return [];
+  return getTestimoniosFromDirectus();
 }
 

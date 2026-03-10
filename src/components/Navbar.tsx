@@ -9,6 +9,7 @@ const navItems = [
 	{ href: "/", label: "Home" },
 	{ href: "/novena", label: "Novena" },
 	{ href: "/blog", label: "Novedades" },
+	{ href: "/testimonios", label: "Testimonios" },
 	{ href: "/entronizaciones", label: "Entronizaciones" },
 	{ href: "/videos", label: "Videos" },
 	{ href: "/contacto", label: "Contacto" },
@@ -48,7 +49,7 @@ export function Navbar() {
 					}`}
 			>
 				<div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-xs md:text-sm">
-					<p className="font-medium tracking-wide">Comunidad Carlo Acutis Argentina</p>
+					<p className="font-medium tracking-wide">San Carlo Acutis Chascomus Argentina 🇦🇷</p>
 					<SocialIcons />
 				</div>
 			</div>
@@ -60,7 +61,7 @@ export function Navbar() {
 				>
 					<Image
 						src="/img/logo/logo.png"
-						alt="Proyecto Carlo Acutis"
+						alt="Misión San Carlo Acutis"
 						width={400}
 						height={400}
 						className="h-20 w-auto object-contain"

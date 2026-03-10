@@ -19,8 +19,8 @@ export default async function Home() {
   return (
     <main className="font-sans">
       <HeroParallax
-        title="Proyecto Carlo Acutis"
-        subtitle="Una página moderna con parallax multicapa, secciones claras y navegación simple."
+        title="Misión San Carlo Acutis"
+        subtitle="Bienvenidos a la web"
         layers={[
           {
             src: "/parallax/catedral.png",
@@ -79,7 +79,7 @@ export default async function Home() {
             <Section
               id="sobre"
               title="Sobre el proyecto"
-              description="Inspirado en el Beato Carlo Acutis, compartimos recursos, devociones y contenidos que impulsan la vida de fe."
+              description="Inspirado en el Santo Carlo Acutis, compartimos recursos, devociones y contenidos que impulsan la vida de fe."
               background="subtle"
             >
               <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

@@ -55,7 +55,7 @@ export async function NovedadesSidebar() {
                         {novedades.map((item) => (
                             <Link
                                 key={item.id}
-                                href={`/blog#${item.slug}`}
+                                href={`/blog/${item.slug}`}
                                 className="group block rounded-xl border border-transparent bg-white/50 p-3.5 transition-all hover:bg-white hover:border-primary-600/20 hover:shadow-md hover:shadow-primary-600/5 active:scale-[0.98]"
                             >
                                 <div className="flex flex-col gap-1.5">

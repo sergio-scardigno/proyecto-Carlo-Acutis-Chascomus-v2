@@ -3,6 +3,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { PageHeader } from "@/components/PageHeader";
 import { SurfaceCard } from "@/components/SurfaceCard";
 import Image from "next/image";
+import Link from "next/link";
 
 export const revalidate = 300;
 
@@ -56,11 +57,21 @@ export default async function BlogPage() {
                       />
                     </div>
                   ) : null}
-                  <h2 className="mt-4 text-xl font-semibold text-primary-700">{item.titulo}</h2>
+                  <h2 className="mt-4 text-xl font-semibold text-primary-700">
+                    <Link href={`/blog/${item.slug}`} className="hover:text-primary-800">
+                      {item.titulo}
+                    </Link>
+                  </h2>
                   {item.fecha ? (
                     <p className="mt-1 text-sm text-primary-600/80">{formatDate(item.fecha)}</p>
                   ) : null}
                   <p className="mt-3 text-sm text-primary-600/90">{item.resumen || item.contenido}</p>
+                  <Link
+                    href={`/blog/${item.slug}`}
+                    className="mt-4 inline-block text-sm font-semibold text-primary-600 hover:text-primary-700"
+                  >
+                    Leer novedad completa
+                  </Link>
                 </SurfaceCard>
               ))}
             </div>

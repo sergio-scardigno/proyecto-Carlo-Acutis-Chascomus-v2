@@ -8,7 +8,7 @@ export function Footer() {
 				<div>
 					<Image
 						src="/img/logo/logo.png"
-						alt="Proyecto Carlo Acutis"
+						alt="Misión San Carlo Acutis"
 						width={400}
 						height={400}
 						className="h-28 w-auto object-contain"
@@ -90,13 +90,13 @@ export function Footer() {
 							src="/img/fibra.png"
 							width={100}
 							height={100}
-							alt="Logo de Fibra TV, impulsor del proyecto Carlo Acutis Chascomús"
+							alt="Logo de Fibra TV, impulsor de Misión San Carlo Acutis Chascomús"
 							className="rounded-lg shadow-lg"
 						/>
 						<div className="text-sm text-primary-700/85">
 							<p>Impulsado por Fibra TV</p>
 							<p className="text-xs text-primary-700/70">
-								&copy; {new Date().getFullYear()} Proyecto Carlo Acutis Chascomús
+								&copy; {new Date().getFullYear()} Misión San Carlo Acutis Chascomús
 							</p>
 						</div>
 					</div>

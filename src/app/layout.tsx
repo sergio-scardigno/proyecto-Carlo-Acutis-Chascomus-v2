@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Proyecto Carlo Acutis",
+	title: "Misión San Carlo Acutis",
 	description: "Sitio moderno con hero parallax y secciones.",
 };
 
