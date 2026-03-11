@@ -91,6 +91,33 @@ function toStringValue(value: unknown) {
   return typeof value === "string" ? value : "";
 }
 
+function splitMultiValueString(value: string) {
+  const normalized = value.trim();
+  if (!normalized) return [];
+
+  if (normalized.startsWith("[") && normalized.endsWith("]")) {
+    try {
+      const parsed = JSON.parse(normalized);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((item) =>
+            typeof item === "string" || typeof item === "number" ? String(item).trim() : "",
+          )
+          .filter(Boolean);
+      }
+    } catch {
+      // Si no es JSON válido, seguimos con la división por separadores.
+    }
+  }
+
+  const candidates = normalized
+    .split(/[\n|;,]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return candidates.length > 1 ? candidates : [normalized];
+}
+
 function buildSlug(value: string, fallback: string) {
   if (value) return value;
   return fallback
@@ -147,6 +174,24 @@ function extractYoutubeVideoId(url: string) {
   return "";
 }
 
+function extractIframeSrc(value: string) {
+  const match = value.match(/src=["']([^"']+)["']/i);
+  return match?.[1]?.trim() ?? "";
+}
+
+function normalizePotentialYoutubeValue(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  if (trimmed.includes("<iframe")) {
+    const iframeSrc = extractIframeSrc(trimmed);
+    if (!iframeSrc) return "";
+    return extractYoutubeVideoId(iframeSrc) ? iframeSrc : "";
+  }
+
+  return extractYoutubeVideoId(trimmed) ? trimmed : "";
+}
+
 function buildYoutubeEmbedUrl(videoId: string) {
   return videoId ? `https://www.youtube.com/embed/${encodeURIComponent(videoId)}` : "";
 }
@@ -189,9 +234,11 @@ function normalizeEntronizacion(row: Record<string, string>): Entronizacion {
 
 function normalizeCmsUrl(url: string) {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/") && DIRECTUS_BASE_URL) return `${DIRECTUS_BASE_URL}${url}`;
-  return url;
+  const normalized = url.trim();
+  if (!normalized) return "";
+  if (normalized.startsWith("http://") || normalized.startsWith("https://")) return normalized;
+  if (normalized.startsWith("/") && DIRECTUS_BASE_URL) return `${DIRECTUS_BASE_URL}${normalized}`;
+  return normalized;
 }
 
 function buildDirectusAssetUrl(assetId: string | number) {
@@ -257,36 +304,49 @@ function extractImageUrls(raw: unknown): string[] {
   const items = Array.isArray(raw) ? raw : [raw];
 
   return items
-    .map((item) => {
+    .flatMap((item) => {
       if (typeof item === "string") {
-        if (item.startsWith("http://") || item.startsWith("https://") || item.startsWith("/")) {
-          return normalizeCmsUrl(item);
-        }
-        return buildDirectusAssetUrl(item);
+        return splitMultiValueString(item)
+          .map((part) => {
+            if (part.startsWith("http://") || part.startsWith("https://") || part.startsWith("/")) {
+              return normalizeCmsUrl(part);
+            }
+            return buildDirectusAssetUrl(part);
+          })
+          .filter(Boolean);
       }
 
       if (typeof item === "number") {
-        return buildDirectusAssetUrl(item);
+        return [buildDirectusAssetUrl(item)];
       }
 
-      if (typeof item !== "object" || item === null) return "";
+      if (typeof item !== "object" || item === null) return [];
       const record = item as JsonObject;
 
-      if (typeof record.url === "string") return normalizeCmsUrl(record.url);
-      if (typeof record.imagen === "string") return normalizeCmsUrl(record.imagen);
-      if (typeof record.imagen_url === "string") return normalizeCmsUrl(record.imagen_url);
-      if (typeof record.thumbnail === "string") return normalizeCmsUrl(record.thumbnail);
+      const directStringCandidates = [
+        record.url,
+        record.imagen,
+        record.imagen_url,
+        record.thumbnail,
+        record.src,
+        record.path,
+      ]
+        .filter((value): value is string => typeof value === "string")
+        .flatMap((value) => splitMultiValueString(value))
+        .map((value) => normalizeCmsUrl(value))
+        .filter(Boolean);
+      if (directStringCandidates.length > 0) return directStringCandidates;
 
       const directusFile = record.directus_files_id;
       if (typeof directusFile === "string" || typeof directusFile === "number") {
-        return buildDirectusAssetUrl(directusFile);
+        return [buildDirectusAssetUrl(directusFile)];
       }
 
       if (typeof directusFile === "object" && directusFile !== null) {
         const directusFileRecord = directusFile as JsonObject;
-        if (typeof directusFileRecord.url === "string") return normalizeCmsUrl(directusFileRecord.url);
+        if (typeof directusFileRecord.url === "string") return [normalizeCmsUrl(directusFileRecord.url)];
         if (typeof directusFileRecord.id === "string" || typeof directusFileRecord.id === "number") {
-          return buildDirectusAssetUrl(directusFileRecord.id);
+          return [buildDirectusAssetUrl(directusFileRecord.id)];
         }
       }
 
@@ -303,20 +363,79 @@ function extractImageUrls(raw: unknown): string[] {
       for (const key of imageLikeKeys) {
         const value = record[key];
         if (typeof value === "string" || typeof value === "number") {
-          return buildDirectusAssetUrl(value);
+          return [buildDirectusAssetUrl(value)];
         }
         if (typeof value === "object" && value !== null) {
           const nested = value as JsonObject;
-          if (typeof nested.url === "string") return normalizeCmsUrl(nested.url);
+          if (typeof nested.url === "string") return [normalizeCmsUrl(nested.url)];
           if (typeof nested.id === "string" || typeof nested.id === "number") {
-            return buildDirectusAssetUrl(nested.id);
+            return [buildDirectusAssetUrl(nested.id)];
           }
         }
       }
 
-      return "";
+      return [];
     })
     .filter(isUsableImageUrl);
+}
+
+function extractYoutubeUrl(raw: unknown): string {
+  if (!raw) return "";
+  if (typeof raw === "string") return normalizePotentialYoutubeValue(raw);
+
+  if (Array.isArray(raw)) {
+    for (const item of raw) {
+      const candidate = extractYoutubeUrl(item);
+      if (candidate) return candidate;
+    }
+    return "";
+  }
+
+  if (typeof raw !== "object") return "";
+  const record = raw as JsonObject;
+
+  const directKeys = [
+    "youtubeUrl",
+    "youtube_url",
+    "youtube",
+    "youtubeVideoUrl",
+    "youtube_video_url",
+    "urlYoutube",
+    "url_youtube",
+    "videoUrl",
+    "video_url",
+    "url_video",
+    "embed",
+    "embedUrl",
+    "youtubeEmbedUrl",
+    "youtube_embed_url",
+  ];
+
+  for (const key of directKeys) {
+    const value = record[key];
+    if (typeof value === "string") {
+      const normalized = normalizePotentialYoutubeValue(value);
+      if (normalized) return normalized;
+    }
+  }
+
+  const genericKeys = ["url", "link", "enlace", "href"];
+  for (const key of genericKeys) {
+    const value = record[key];
+    if (typeof value === "string") {
+      const normalized = normalizePotentialYoutubeValue(value);
+      if (normalized) return normalized;
+    }
+  }
+
+  const nestedKeys = ["video", "youtubeVideo", "media", "contenido", "content"];
+  for (const key of nestedKeys) {
+    const value = record[key];
+    const nestedCandidate = extractYoutubeUrl(value);
+    if (nestedCandidate) return nestedCandidate;
+  }
+
+  return "";
 }
 
 async function getNovedadesFromCsv(): Promise<Novedad[]> {
@@ -360,19 +479,20 @@ async function getNovedadesFromDirectus(): Promise<Novedad[]> {
       toStringValue(safeEntry.date_created) ||
       toStringValue(safeEntry.date_updated);
     const slug = buildSlug(toStringValue(safeEntry.slug), titulo || contenido || `novedad-${safeEntry.id ?? 0}`);
-    const youtubeUrl = pickStringValue(safeEntry, [
-      "youtubeUrl",
-      "youtube_url",
-      "youtube",
-      "youtubeVideoUrl",
-      "youtube_video_url",
-      "urlYoutube",
-      "url_youtube",
-      "videoUrl",
-      "video_url",
-      "url_video",
-      "url",
-    ]);
+    const youtubeUrl =
+      extractYoutubeUrl(safeEntry) ||
+      pickStringValue(safeEntry, [
+        "youtubeUrl",
+        "youtube_url",
+        "youtube",
+        "youtubeVideoUrl",
+        "youtube_video_url",
+        "urlYoutube",
+        "url_youtube",
+        "videoUrl",
+        "video_url",
+        "url_video",
+      ]);
     const videoId = extractYoutubeVideoId(youtubeUrl);
     const publicado =
       typeof safeEntry.publicado === "boolean"
