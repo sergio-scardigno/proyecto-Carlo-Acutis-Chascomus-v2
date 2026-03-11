@@ -557,14 +557,16 @@ async function getVideosFromDirectus(): Promise<Video[]> {
       const safeEntry = typeof entry === "object" && entry !== null ? (entry as JsonObject) : {};
       const titulo = pickStringValue(safeEntry, ["titulo", "title", "nombre"]);
       const descripcion = pickStringValue(safeEntry, ["descripcion", "texto", "resumen", "content"]);
-      const youtubeUrl = pickStringValue(safeEntry, [
-        "youtubeUrl",
-        "youtube_url",
-        "enlaceYoutube",
-        "enlace_youtube",
-        "enlace",
-        "url",
-      ]);
+      const youtubeUrl =
+        extractYoutubeUrl(safeEntry) ||
+        pickStringValue(safeEntry, [
+          "youtubeUrl",
+          "youtube_url",
+          "enlaceYoutube",
+          "enlace_youtube",
+          "enlace",
+          "url",
+        ]);
       const videoId = extractYoutubeVideoId(youtubeUrl);
       const status = toStringValue(safeEntry.status).toLowerCase();
       const publicado =
@@ -588,10 +590,7 @@ async function getVideosFromDirectus(): Promise<Video[]> {
 }
 
 async function getTestimoniosFromDirectus(): Promise<Testimonio[]> {
-  const payload = await fetchDirectusJsonWithDateFallback(
-    DIRECTUS_TESTIMONIOS_ENDPOINT,
-    DIRECTUS_TESTIMONIOS_FALLBACK_ENDPOINT,
-  );
+  const payload = await fetchDirectusTestimoniosPayload();
   const entries = readDataEntries(payload);
 
   return entries
@@ -599,17 +598,19 @@ async function getTestimoniosFromDirectus(): Promise<Testimonio[]> {
       const safeEntry = typeof entry === "object" && entry !== null ? (entry as JsonObject) : {};
       const titulo = pickStringValue(safeEntry, ["titulo", "title", "nombre"]);
       const descripcion = pickStringValue(safeEntry, ["descripcion", "texto", "resumen", "content"]);
-      const youtubeUrl = pickStringValue(safeEntry, [
-        "youtubeUrl",
-        "youtube_url",
-        "enlaceYoutube",
-        "enlace_youtube",
-        "enlace",
-        "url",
-        "url_video",
-        "videoUrl",
-        "video_url",
-      ]);
+      const youtubeUrl =
+        extractYoutubeUrl(safeEntry) ||
+        pickStringValue(safeEntry, [
+          "youtubeUrl",
+          "youtube_url",
+          "enlaceYoutube",
+          "enlace_youtube",
+          "enlace",
+          "url",
+          "url_video",
+          "videoUrl",
+          "video_url",
+        ]);
       const videoId = extractYoutubeVideoId(youtubeUrl);
       const status = toStringValue(safeEntry.status).toLowerCase();
       const publicado =
@@ -631,6 +632,33 @@ async function getTestimoniosFromDirectus(): Promise<Testimonio[]> {
       };
     })
     .filter((item) => item.publicado && item.youtubeEmbedUrl);
+}
+
+async function fetchDirectusTestimoniosPayload() {
+  const candidates = Array.from(
+    new Set([
+      DIRECTUS_TESTIMONIOS_ENDPOINT,
+      DIRECTUS_TESTIMONIOS_FALLBACK_ENDPOINT,
+      "/items/testimonios?sort=-id",
+      "/items/testimonios",
+    ]),
+  );
+
+  let firstSuccessPayload: JsonObject | null = null;
+  let lastError: unknown = null;
+
+  for (const endpoint of candidates) {
+    try {
+      const payload = await fetchDirectusJson(endpoint);
+      firstSuccessPayload ??= payload;
+      if (readDataEntries(payload).length > 0) return payload;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (firstSuccessPayload) return firstSuccessPayload;
+  throw lastError ?? new Error("No pudimos obtener testimonios desde Directus.");
 }
 
 async function fetchDirectusVideosPayload() {
