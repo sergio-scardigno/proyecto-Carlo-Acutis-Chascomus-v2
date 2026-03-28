@@ -118,6 +118,12 @@ function splitMultiValueString(value: string) {
   return candidates.length > 1 ? candidates : [normalized];
 }
 
+/** Títulos visibles distintos al del CMS para slugs concretos (la URL no cambia). */
+function displayTitleForNovedadSlug(slug: string, titulo: string) {
+  if (slug === "entronizacion") return "Canonización";
+  return titulo;
+}
+
 function buildSlug(value: string, fallback: string) {
   if (value) return value;
   return fallback
@@ -204,11 +210,13 @@ function normalizeNovedad(row: Record<string, string>): Novedad {
   const youtubeUrl = row.youtube_url ?? row.youtubeUrl ?? row.url_video ?? "";
   const videoId = extractYoutubeVideoId(youtubeUrl);
   const imagenes = splitImages(row.imagenes ?? row.imagen ?? "");
+  const slug = row.slug ?? "";
+  const titulo = displayTitleForNovedadSlug(slug, row.titulo ?? "");
 
   return {
     id: Number(row.id) || 0,
-    slug: row.slug ?? "",
-    titulo: row.titulo ?? "",
+    slug,
+    titulo,
     resumen: row.resumen ?? "",
     contenido: row.contenido ?? "",
     fecha: row.fecha ?? "",
@@ -479,6 +487,7 @@ async function getNovedadesFromDirectus(): Promise<Novedad[]> {
       toStringValue(safeEntry.date_created) ||
       toStringValue(safeEntry.date_updated);
     const slug = buildSlug(toStringValue(safeEntry.slug), titulo || contenido || `novedad-${safeEntry.id ?? 0}`);
+    const tituloVisible = displayTitleForNovedadSlug(slug, titulo);
     const youtubeUrl =
       extractYoutubeUrl(safeEntry) ||
       pickStringValue(safeEntry, [
@@ -502,7 +511,7 @@ async function getNovedadesFromDirectus(): Promise<Novedad[]> {
     return {
       id: entryId,
       slug,
-      titulo,
+      titulo: tituloVisible,
       resumen,
       contenido,
       fecha,
