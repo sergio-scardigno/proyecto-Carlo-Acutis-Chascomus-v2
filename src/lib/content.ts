@@ -52,6 +52,9 @@ export type Mision = {
   titulo: string;
   texto: string;
   imagenes: string[];
+  youtubeUrl: string;
+  youtubeEmbedUrl: string;
+  thumbnailUrl: string;
   fecha: string;
   publicado: boolean;
 };
@@ -687,6 +690,20 @@ async function getMisionesFromDirectus(): Promise<Mision[]> {
       const titulo = pickStringValue(safeEntry, ["titulo", "title", "nombre"]);
       const texto = pickStringValue(safeEntry, ["texto", "descripcion", "contenido", "content"]);
       const imagenes = extractImageUrls(safeEntry.imagenes);
+      const youtubeUrl =
+        extractYoutubeUrl(safeEntry) ||
+        pickStringValue(safeEntry, [
+          "youtubeUrl",
+          "youtube_url",
+          "enlaceYoutube",
+          "enlace_youtube",
+          "enlace",
+          "url",
+          "url_video",
+          "videoUrl",
+          "video_url",
+        ]);
+      const videoId = extractYoutubeVideoId(youtubeUrl);
       const fecha = pickStringValue(safeEntry, ["date_created", "fecha", "date_updated"]);
       const status = toStringValue(safeEntry.status).toLowerCase();
       const publicado =
@@ -701,6 +718,9 @@ async function getMisionesFromDirectus(): Promise<Mision[]> {
         titulo,
         texto,
         imagenes,
+        youtubeUrl,
+        youtubeEmbedUrl: buildYoutubeEmbedUrl(videoId),
+        thumbnailUrl: buildYoutubeThumbnailUrl(videoId),
         fecha,
         publicado,
       };

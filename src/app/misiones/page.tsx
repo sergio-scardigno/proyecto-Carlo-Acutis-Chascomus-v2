@@ -64,14 +64,27 @@ export default async function MisionesPage() {
           ) : misiones.length === 0 ? (
             <EmptyState message="Aun no hay misiones publicadas." />
           ) : (
-            <div className="space-y-8">
+            <div className="grid gap-6 md:grid-cols-2">
               {misiones.map((item) => (
-              <SurfaceCard key={item.id}>
+              <SurfaceCard key={item.id} className="h-full">
                 <h2 className="text-xl font-semibold text-primary-700">{item.titulo}</h2>
                 {item.fecha ? (
                   <p className="mt-1 text-sm text-primary-600/80">{formatDate(item.fecha)}</p>
                 ) : null}
                 {item.texto ? <p className="mt-3 text-primary-600/90">{item.texto}</p> : null}
+                {item.youtubeEmbedUrl ? (
+                  <div className="mt-4 overflow-hidden rounded-xl">
+                    <iframe
+                      className="aspect-video w-full"
+                      src={item.youtubeEmbedUrl}
+                      title={`Misión en YouTube: ${item.titulo}`}
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : null}
                 {item.imagenes.length > 0 ? (
                   <ImageGallery images={item.imagenes} lugar={item.titulo} slug={`mision-${item.id}`} />
                 ) : null}

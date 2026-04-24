@@ -2,18 +2,27 @@ import { HeroParallax } from "@/components/HeroParallax";
 import { Section } from "@/components/Section";
 import Link from "next/link";
 import { NovedadesSidebar } from "@/components/NovedadesSidebar";
-import { getVideos, type Video } from "@/lib/content";
+import { getVideos, getMisiones, type Video } from "@/lib/content";
 import { FeaturedVideoCard } from "@/components/FeaturedVideoCard";
+import { MisionesHomeCard } from "@/components/MisionesHomeCard";
 import { ContactForm } from "@/components/ContactForm";
 
 export default async function Home() {
   let featuredVideo: Video | null = null;
+  let misionConVideo: Awaited<ReturnType<typeof getMisiones>>[number] | null = null;
 
   try {
     const videos = await getVideos();
     featuredVideo = videos[0] ?? null;
   } catch {
     featuredVideo = null;
+  }
+
+  try {
+    const misiones = await getMisiones();
+    misionConVideo = misiones.find((m) => m.youtubeEmbedUrl) ?? null;
+  } catch {
+    misionConVideo = null;
   }
 
   return (
@@ -86,11 +95,15 @@ export default async function Home() {
                 <Card title="Novena" desc="Reza la novena de Carlo Acutis." href="/novena" />
                 <Card title="Novedades" desc="Artículos y reflexiones." href="/blog" />
                 <Card title="Entronizaciones" desc="Guía y testimonios." href="/entronizaciones" />
-                <Card
-                  title="Misiones"
-                  desc="Conoce nuestras misiones de evangelización en todo el país."
-                  href="/misiones"
-                />
+                {misionConVideo ? (
+                  <MisionesHomeCard mission={misionConVideo} />
+                ) : (
+                  <Card
+                    title="Misiones"
+                    desc="Conoce nuestras misiones de evangelización en todo el país."
+                    href="/misiones"
+                  />
+                )}
               </div>
             </Section>
             <Section
