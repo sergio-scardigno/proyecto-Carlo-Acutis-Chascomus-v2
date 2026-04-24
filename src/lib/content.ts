@@ -47,6 +47,15 @@ export type Testimonio = {
   publicado: boolean;
 };
 
+export type Mision = {
+  id: number;
+  titulo: string;
+  texto: string;
+  imagenes: string[];
+  fecha: string;
+  publicado: boolean;
+};
+
 const CONTENT_SOURCE = process.env.CONTENT_SOURCE ?? (process.env.DIRECTUS_BASE_URL ? "directus" : "csv");
 const DIRECTUS_BASE_URL = process.env.DIRECTUS_BASE_URL ?? "";
 const DIRECTUS_API_TOKEN = process.env.DIRECTUS_API_TOKEN ?? "";
@@ -62,12 +71,17 @@ const DIRECTUS_VIDEOS_ENDPOINT =
 const DIRECTUS_TESTIMONIOS_ENDPOINT =
   process.env.DIRECTUS_TESTIMONIOS_ENDPOINT ??
   "/items/testimonios?filter[status][_eq]=published&sort=-id";
+const DIRECTUS_MISIONES_ENDPOINT =
+  process.env.DIRECTUS_MISIONES_ENDPOINT ??
+  "/items/misiones?fields=*,imagenes.*&filter[status][_eq]=published&sort=-id";
 const DIRECTUS_NOVEDADES_FALLBACK_ENDPOINT =
   "/items/novedades?fields=*,imagenes.*&filter[status][_eq]=published&sort=-id";
 const DIRECTUS_ENTRONIZACIONES_FALLBACK_ENDPOINT =
   "/items/entronizaciones?fields=*,imagenes.*&filter[status][_eq]=published&sort=-id";
 const DIRECTUS_VIDEOS_FALLBACK_ENDPOINT = "/items/videos?filter[status][_eq]=published&sort=-id";
 const DIRECTUS_TESTIMONIOS_FALLBACK_ENDPOINT = "/items/testimonios?filter[status][_eq]=published&sort=-id";
+const DIRECTUS_MISIONES_FALLBACK_ENDPOINT =
+  "/items/misiones?fields=*,imagenes.*&filter[status][_eq]=published&sort=-id";
 type JsonObject = Record<string, unknown>;
 
 async function readProjectCsv(relativePath: string) {
@@ -643,6 +657,37 @@ async function getTestimoniosFromDirectus(): Promise<Testimonio[]> {
     .filter((item) => item.publicado && item.youtubeEmbedUrl);
 }
 
+async function getMisionesFromDirectus(): Promise<Mision[]> {
+  const payload = await fetchDirectusMisionesPayload();
+  const entries = readDataEntries(payload);
+
+  return entries
+    .map((entry) => {
+      const safeEntry = typeof entry === "object" && entry !== null ? (entry as JsonObject) : {};
+      const titulo = pickStringValue(safeEntry, ["titulo", "title", "nombre"]);
+      const texto = pickStringValue(safeEntry, ["texto", "descripcion", "contenido", "content"]);
+      const imagenes = extractImageUrls(safeEntry.imagenes);
+      const fecha = pickStringValue(safeEntry, ["date_created", "fecha", "date_updated"]);
+      const status = toStringValue(safeEntry.status).toLowerCase();
+      const publicado =
+        typeof safeEntry.publicado === "boolean"
+          ? safeEntry.publicado
+          : status
+            ? status === "published" || status === "active"
+            : true;
+
+      return {
+        id: Number(safeEntry.id ?? 0),
+        titulo,
+        texto,
+        imagenes,
+        fecha,
+        publicado,
+      };
+    })
+    .filter((item) => item.publicado && (item.titulo || item.texto));
+}
+
 async function fetchDirectusTestimoniosPayload() {
   const candidates = Array.from(
     new Set([
@@ -697,6 +742,33 @@ async function fetchDirectusVideosPayload() {
   throw lastError ?? new Error("No pudimos obtener videos desde Directus.");
 }
 
+async function fetchDirectusMisionesPayload() {
+  const candidates = Array.from(
+    new Set([
+      DIRECTUS_MISIONES_ENDPOINT,
+      DIRECTUS_MISIONES_FALLBACK_ENDPOINT,
+      "/items/misiones?sort=-id",
+      "/items/misiones",
+    ]),
+  );
+
+  let firstSuccessPayload: JsonObject | null = null;
+  let lastError: unknown = null;
+
+  for (const endpoint of candidates) {
+    try {
+      const payload = await fetchDirectusJson(endpoint);
+      firstSuccessPayload ??= payload;
+      if (readDataEntries(payload).length > 0) return payload;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (firstSuccessPayload) return firstSuccessPayload;
+  throw lastError ?? new Error("No pudimos obtener misiones desde Directus.");
+}
+
 export async function getNovedades() {
   return CONTENT_SOURCE === "csv" ? getNovedadesFromCsv() : getNovedadesFromDirectus();
 }
@@ -713,5 +785,10 @@ export async function getVideos() {
 export async function getTestimonios() {
   if (CONTENT_SOURCE === "csv") return [];
   return getTestimoniosFromDirectus();
+}
+
+export async function getMisiones() {
+  if (CONTENT_SOURCE === "csv" && !DIRECTUS_BASE_URL) return [];
+  return getMisionesFromDirectus();
 }
 

@@ -38,6 +38,11 @@ export function Footer() {
 								Entronizaciones
 							</a>
 						</li>
+						<li>
+							<a className="transition hover:text-white" href="/misiones">
+								Misiones
+							</a>
+						</li>
 					</ul>
 				</div>
 				<div>

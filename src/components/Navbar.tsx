@@ -11,6 +11,7 @@ const navItems = [
 	{ href: "/blog", label: "Novedades" },
 	{ href: "/testimonios", label: "Testimonios" },
 	{ href: "/entronizaciones", label: "Entronizaciones" },
+	{ href: "/misiones", label: "Misiones" },
 	{ href: "/videos", label: "Videos" },
 	{ href: "/contacto", label: "Contacto" },
 ];
