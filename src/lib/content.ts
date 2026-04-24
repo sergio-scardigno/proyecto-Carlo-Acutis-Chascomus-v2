@@ -297,6 +297,26 @@ async function fetchDirectusJson(endpoint: string) {
   return (await response.json()) as JsonObject;
 }
 
+async function fetchDirectusJsonNoCache(endpoint: string) {
+  if (!DIRECTUS_BASE_URL) {
+    throw new Error("Falta DIRECTUS_BASE_URL para consumir contenido de Directus.");
+  }
+
+  const response = await fetch(`${DIRECTUS_BASE_URL}${endpoint}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(DIRECTUS_API_TOKEN ? { Authorization: `Bearer ${DIRECTUS_API_TOKEN}` } : {}),
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error Directus ${response.status}: ${await response.text()}`);
+  }
+
+  return (await response.json()) as JsonObject;
+}
+
 function isForbiddenSortFieldError(error: unknown) {
   return (
     error instanceof Error &&
@@ -703,7 +723,7 @@ async function fetchDirectusTestimoniosPayload() {
 
   for (const endpoint of candidates) {
     try {
-      const payload = await fetchDirectusJson(endpoint);
+      const payload = await fetchDirectusJsonNoCache(endpoint);
       firstSuccessPayload ??= payload;
       if (readDataEntries(payload).length > 0) return payload;
     } catch (error) {
