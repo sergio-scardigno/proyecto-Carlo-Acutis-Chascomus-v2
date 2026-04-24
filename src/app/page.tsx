@@ -86,6 +86,11 @@ export default async function Home() {
                 <Card title="Novena" desc="Reza la novena de Carlo Acutis." href="/novena" />
                 <Card title="Novedades" desc="Artículos y reflexiones." href="/blog" />
                 <Card title="Entronizaciones" desc="Guía y testimonios." href="/entronizaciones" />
+                <Card
+                  title="Misiones"
+                  desc="Conoce nuestras misiones de evangelización en todo el país."
+                  href="/misiones"
+                />
               </div>
             </Section>
             <Section
