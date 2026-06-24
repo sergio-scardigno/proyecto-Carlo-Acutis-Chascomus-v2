@@ -6,10 +6,19 @@ import { getVideos, getMisiones, type Video } from "@/lib/content";
 import { FeaturedVideoCard } from "@/components/FeaturedVideoCard";
 import { MisionesHomeCard } from "@/components/MisionesHomeCard";
 import { ContactForm } from "@/components/ContactForm";
+import { InstagramHomeSection } from "@/components/InstagramHomeSection";
+import {
+  getInstagramProfile,
+  getInstagramPostsPreview,
+  type InstagramPost,
+  type InstagramProfile,
+} from "@/lib/instagram";
 
 export default async function Home() {
   let featuredVideo: Video | null = null;
   let misionConVideo: Awaited<ReturnType<typeof getMisiones>>[number] | null = null;
+  let instagramProfile: InstagramProfile | null = null;
+  let instagramPosts: InstagramPost[] = [];
 
   try {
     const videos = await getVideos();
@@ -23,6 +32,18 @@ export default async function Home() {
     misionConVideo = misiones.find((m) => m.youtubeEmbedUrl) ?? null;
   } catch {
     misionConVideo = null;
+  }
+
+  try {
+    const [profile, posts] = await Promise.all([
+      getInstagramProfile(),
+      getInstagramPostsPreview(6),
+    ]);
+    instagramProfile = profile;
+    instagramPosts = posts;
+  } catch {
+    instagramProfile = null;
+    instagramPosts = [];
   }
 
   return (
@@ -104,8 +125,13 @@ export default async function Home() {
                     href="/misiones"
                   />
                 )}
+                <Card title="Instagram" desc="Mirá nuestras últimas publicaciones." href="/instagram" />
               </div>
             </Section>
+
+            {instagramProfile ? (
+              <InstagramHomeSection profile={instagramProfile} posts={instagramPosts} />
+            ) : null}
             <Section
               title="Multimedia y contacto"
               description="Explora videos y ponte en contacto con nosotros."

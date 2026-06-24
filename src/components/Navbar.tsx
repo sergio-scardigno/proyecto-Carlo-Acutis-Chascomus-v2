@@ -13,6 +13,7 @@ const navItems = [
 	{ href: "/entronizaciones", label: "Entronizaciones" },
 	{ href: "/misiones", label: "Misiones" },
 	{ href: "/videos", label: "Videos" },
+	{ href: "/instagram", label: "Instagram" },
 	{ href: "/contacto", label: "Contacto" },
 ];
 
