@@ -46,6 +46,20 @@ body {
   font-family: var(--font-geist-sans), "Montserrat", system-ui, sans-serif;
 }
 
+a,
+button,
+input,
+textarea,
+select {
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+
+:where(a, button, input, textarea, select, [role="button"]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .page-shell {
   min-height: calc(100vh - 140px);
   padding-block: 3.5rem;
@@ -67,6 +81,25 @@ body {
     0 4px 10px -8px rgba(2, 30, 115, 0.2);
 }
 
+.section-block {
+  padding-block: 3rem;
+}
+
+.surface-card-interactive {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease;
+}
+
+.surface-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 32px -22px rgba(2, 30, 115, 0.4),
+    0 8px 16px -12px rgba(2, 30, 115, 0.3);
+}
+
 @media (min-width: 768px) {
   .page-shell {
     padding-block: 4.5rem;
@@ -74,5 +107,9 @@ body {
 
   .page-content {
     padding-inline: 1.5rem;
+  }
+
+  .section-block {
+    padding-block: 4rem;
   }
 }

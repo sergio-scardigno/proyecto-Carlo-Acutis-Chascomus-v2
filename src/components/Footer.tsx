@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { SocialIcons } from "./SocialIcons";
 
 export function Footer() {
@@ -13,7 +14,7 @@ export function Footer() {
 						height={400}
 						className="h-28 w-auto object-contain"
 					/>
-					<p className="mt-3 text-sm leading-relaxed text-blue-100/90">
+					<p className="mt-3 text-sm leading-relaxed text-blue-100/95">
 						Espacio de evangelización y encuentro para compartir devociones, testimonios y
 						recursos inspirados en la vida de Carlo Acutis.
 					</p>
@@ -24,24 +25,24 @@ export function Footer() {
 					</h4>
 					<ul className="mt-3 space-y-2 text-sm">
 						<li>
-							<a className="transition hover:text-white" href="/novena">
+							<Link className="cursor-pointer rounded-sm transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="/novena">
 								Novena
-							</a>
+							</Link>
 						</li>
 						<li>
-							<a className="transition hover:text-white" href="/blog">
+							<Link className="cursor-pointer rounded-sm transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="/blog">
 								Novedades
-							</a>
+							</Link>
 						</li>
 						<li>
-							<a className="transition hover:text-white" href="/entronizaciones">
+							<Link className="cursor-pointer rounded-sm transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="/entronizaciones">
 								Entronizaciones
-							</a>
+							</Link>
 						</li>
 						<li>
-							<a className="transition hover:text-white" href="/misiones">
+							<Link className="cursor-pointer rounded-sm transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="/misiones">
 								Misiones
-							</a>
+							</Link>
 						</li>
 					</ul>
 				</div>
@@ -51,14 +52,14 @@ export function Footer() {
 					</h4>
 					<ul className="mt-3 space-y-2 text-sm">
 						<li>
-							<a className="transition hover:text-white" href="/videos">
+							<Link className="cursor-pointer rounded-sm transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="/videos">
 								Videos
-							</a>
+							</Link>
 						</li>
 						<li>
-							<a className="transition hover:text-white" href="/contacto">
+							<Link className="cursor-pointer rounded-sm transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" href="/contacto">
 								Contacto
-							</a>
+							</Link>
 						</li>
 					</ul>
 					<div className="mt-5">
@@ -77,7 +78,7 @@ export function Footer() {
 							target="_blank"
 							rel="noopener noreferrer"
 							aria-label="Diseño y desarrollo por Sergio Scardigno"
-							className="rounded-lg p-1 transition hover:bg-primary-700/10"
+							className="cursor-pointer rounded-lg p-1 transition-colors hover:bg-primary-700/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
 						>
 							<span className="block">
 								<Image

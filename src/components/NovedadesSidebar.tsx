@@ -30,7 +30,7 @@ export async function NovedadesSidebar() {
 
     return (
         <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="surface-card rounded-2xl p-5 shadow-sm border border-primary-600/10">
+            <div className="surface-card rounded-2xl border border-primary-600/10 p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-3 mb-6">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-6 bg-primary-600 rounded-full" />
@@ -38,7 +38,7 @@ export async function NovedadesSidebar() {
                     </div>
                     <Link
                         href="/blog"
-                        className="text-xs font-bold text-primary-600 hover:text-primary-700 transition-colors uppercase tracking-wider"
+                        className="cursor-pointer text-xs font-bold uppercase tracking-wider text-primary-600 transition-colors hover:text-primary-700 focus-visible:outline-primary-500"
                     >
                         Ver todas
                     </Link>
@@ -56,19 +56,19 @@ export async function NovedadesSidebar() {
                             <Link
                                 key={item.id}
                                 href={`/blog/${item.slug}`}
-                                className="group block rounded-xl border border-transparent bg-white/50 p-3.5 transition-all hover:bg-white hover:border-primary-600/20 hover:shadow-md hover:shadow-primary-600/5 active:scale-[0.98]"
+                                className="surface-card-interactive group block cursor-pointer rounded-xl border border-transparent bg-white/50 p-3.5 transition-all hover:border-primary-600/20 hover:bg-white hover:shadow-md hover:shadow-primary-600/5 active:scale-[0.98] focus-visible:outline-primary-500"
                             >
                                 <div className="flex flex-col gap-1.5">
                                     <p className="line-clamp-2 text-[15px] font-semibold text-primary-700 leading-snug group-hover:text-primary-800 transition-colors">
                                         {item.titulo}
                                     </p>
                                     {getShortExcerpt(item) ? (
-                                        <p className="text-xs text-primary-600/85">
+                                        <p className="text-xs text-primary-600">
                                             {getShortExcerpt(item)}
                                         </p>
                                     ) : null}
                                     {item.fecha ? (
-                                        <div className="flex items-center gap-1.5 opacity-60">
+                                        <div className="flex items-center gap-1.5 text-primary-600/80">
                                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>

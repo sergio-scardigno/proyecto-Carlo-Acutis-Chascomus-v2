@@ -38,7 +38,7 @@ export function FeaturedVideoCard({ video }: FeaturedVideoCardProps) {
         </div>
 
         <h3 className="mt-4 text-lg font-semibold text-primary-700">{video.titulo}</h3>
-        <p className="mt-2 text-sm text-primary-600/85">
+        <p className="mt-2 text-sm text-primary-600">
           {video.descripcion || "Video destacado de la comunidad."}
         </p>
 
@@ -46,13 +46,13 @@ export function FeaturedVideoCard({ video }: FeaturedVideoCardProps) {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="rounded-full bg-primary-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-primary-700"
+            className="cursor-pointer rounded-full bg-primary-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition-colors hover:bg-primary-700 focus-visible:outline-primary-500"
           >
             Ver video
           </button>
           <Link
             href="/videos"
-            className="rounded-full border border-primary-600/25 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-700 transition hover:bg-primary-500/10"
+            className="cursor-pointer rounded-full border border-primary-600/25 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-700 transition-colors hover:bg-primary-500/10 focus-visible:outline-primary-500"
           >
             Ver todos los videos
           </Link>
@@ -63,17 +63,21 @@ export function FeaturedVideoCard({ video }: FeaturedVideoCardProps) {
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4"
           onClick={() => setIsOpen(false)}
+          role="presentation"
         >
           <div
             className="surface-card w-full max-w-4xl rounded-2xl p-4 md:p-5"
             onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Video destacado: ${video.titulo}`}
           >
             <div className="mb-3 flex items-center justify-between gap-4">
               <h4 className="text-base font-semibold text-primary-700 md:text-lg">{video.titulo}</h4>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-full border border-primary-600/25 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-700 transition hover:bg-primary-500/10"
+                className="cursor-pointer rounded-full border border-primary-600/25 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary-700 transition-colors hover:bg-primary-500/10 focus-visible:outline-primary-500"
               >
                 Cerrar
               </button>

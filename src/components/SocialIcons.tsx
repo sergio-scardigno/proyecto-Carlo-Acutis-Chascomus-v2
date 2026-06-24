@@ -54,7 +54,7 @@ export function SocialIcons({ className = "", iconClassName = "" }: SocialIconsP
 					target="_blank"
 					rel="noreferrer noopener"
 					aria-label={socialLink.name}
-					className="text-white transition hover:text-white/80"
+					className="cursor-pointer rounded-full p-1 text-white transition-colors hover:text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
 				>
 					<span className={`block h-5 w-5 ${iconClassName}`.trim()}>{socialLink.icon}</span>
 				</a>

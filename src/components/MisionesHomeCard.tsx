@@ -7,7 +7,7 @@ type MisionesHomeCardProps = {
 
 export function MisionesHomeCard({ mission }: MisionesHomeCardProps) {
   return (
-    <article className="surface-card block rounded-2xl p-6 transition hover:-translate-y-0.5 hover:bg-primary-500/5 hover:shadow-lg hover:shadow-primary-500/20">
+    <article className="surface-card surface-card-interactive block rounded-2xl p-6 hover:bg-primary-500/5">
       <h3 className="text-lg font-semibold text-primary-700">
         <Link
           href="/misiones"
@@ -16,7 +16,7 @@ export function MisionesHomeCard({ mission }: MisionesHomeCardProps) {
           Misiones
         </Link>
       </h3>
-      <p className="mt-2 text-sm text-primary-600/85">
+      <p className="mt-2 text-sm text-primary-600">
         Conoce nuestras misiones de evangelización en todo el país.
       </p>
       {mission.titulo ? (
@@ -37,7 +37,7 @@ export function MisionesHomeCard({ mission }: MisionesHomeCardProps) {
       ) : null}
       <Link
         href="/misiones"
-        className="mt-4 inline-flex text-sm font-semibold text-primary-600 underline-offset-4 transition hover:text-primary-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        className="mt-4 inline-flex cursor-pointer text-sm font-semibold text-primary-600 underline-offset-4 transition-colors hover:text-primary-700 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
       >
         Ver todas las misiones
       </Link>

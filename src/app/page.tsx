@@ -83,7 +83,7 @@ export default async function Home() {
         scrollToId="sections"
       />
       <div id="sections" className="page-shell">
-        <div className="page-content grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
+        <div className="page-content grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-12">
           <div>
             <Section
               id="sobre"
@@ -133,10 +133,10 @@ function Card({ title, desc, href }: CardProps) {
   return (
     <Link
       href={href}
-      className="surface-card block rounded-2xl p-6 transition hover:-translate-y-0.5 hover:bg-primary-500/5 hover:shadow-lg hover:shadow-primary-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+      className="surface-card surface-card-interactive block rounded-2xl p-6 hover:bg-primary-500/5 focus-visible:outline-primary-500"
     >
       <h3 className="text-lg font-semibold text-primary-700">{title}</h3>
-      <p className="mt-2 text-sm text-primary-600/85">{desc}</p>
+      <p className="mt-2 text-sm text-primary-600">{desc}</p>
     </Link>
   );
 }

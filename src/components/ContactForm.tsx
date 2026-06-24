@@ -108,51 +108,69 @@ export function ContactForm() {
     <div className="surface-card mx-auto w-full rounded-2xl p-6 shadow-lg">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
+          <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-primary-700">
+            Nombre
+          </label>
           <input
+            id="name"
             type="text"
             name="name"
             placeholder="Tu nombre"
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            aria-invalid={Boolean(errors.email)}
+            className="w-full rounded-md border border-primary-600/20 p-3 text-primary-700 placeholder:text-primary-700/55 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
           />
         </div>
 
         <div>
+          <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-primary-700">
+            Correo electronico
+          </label>
           <input
+            id="email"
             type="email"
             name="email"
             placeholder="ejemplo@dominio.com"
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full rounded-md border border-primary-600/20 p-3 text-primary-700 placeholder:text-primary-700/55 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
           />
-          {errors.email ? <p className="mt-1 text-sm text-blue-600">{errors.email}</p> : null}
+          {errors.email ? <p className="mt-1 text-sm text-accent-500">{errors.email}</p> : null}
         </div>
 
         <div>
+          <label htmlFor="tel" className="mb-1.5 block text-sm font-medium text-primary-700">
+            Telefono
+          </label>
           <PhoneInput
+            id="tel"
             international
             name="tel"
             defaultCountry="AR"
             value={formData.tel || undefined}
             onChange={handlePhoneChange}
-            className="w-full rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            aria-invalid={Boolean(errors.tel)}
+            className="w-full rounded-md border border-primary-600/20 p-3 text-primary-700 placeholder:text-primary-700/55 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:outline-none"
             placeholder="Agrega tu telefono"
           />
-          {errors.tel ? <p className="mt-1 text-sm text-blue-600">{errors.tel}</p> : null}
+          {errors.tel ? <p className="mt-1 text-sm text-accent-500">{errors.tel}</p> : null}
         </div>
 
         <div>
+          <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-primary-700">
+            Mensaje
+          </label>
           <textarea
+            id="message"
             name="message"
             placeholder="Tu mensaje"
             value={formData.message}
             onChange={handleChange}
             required
-            className="w-full rounded-md border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full rounded-md border border-primary-600/20 p-3 text-primary-700 placeholder:text-primary-700/55 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none"
             rows={4}
           />
         </div>
@@ -162,7 +180,7 @@ export function ContactForm() {
         <div className="flex justify-center">
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-500 px-6 py-3 font-semibold text-white shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:outline-none md:w-auto"
+            className="w-full cursor-pointer rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white shadow-md transition-colors hover:bg-primary-700 focus:ring-2 focus:ring-primary-500/35 focus:outline-none md:w-auto"
           >
             Enviar
           </button>
@@ -170,7 +188,11 @@ export function ContactForm() {
       </form>
 
       {status ? (
-        <p className={`mt-4 text-center ${statusType === "error" ? "text-red-600" : "text-green-500"}`}>
+        <p
+          role="status"
+          aria-live="polite"
+          className={`mt-4 text-center ${statusType === "error" ? "text-accent-500" : "text-primary-700"}`}
+        >
           {status}
         </p>
       ) : null}

@@ -151,7 +151,6 @@ export function HeroParallax({
 					const backgroundPosition = layer.position ?? (idx === 0 ? "center" : "center bottom");
 					return (
 						<div
-							// eslint-disable-next-line react/no-array-index-key
 							key={idx}
 							ref={(el) => {
 								layerRefs.current[idx] = el;
@@ -170,12 +169,12 @@ export function HeroParallax({
 				})
 			)}
 			<div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/40 via-black/15 to-transparent" />
-			<div className="relative mx-auto w-full max-w-6xl px-4 pt-2 pb-24 md:py-0">
+			<div className="relative mx-auto w-full max-w-6xl px-4 pt-2 pb-24 md:px-5 md:py-0">
 				<div className="grid items-start gap-3 md:grid-cols-2 md:items-center">
 					{/* Columna izquierda vacía para el layout en 2 columnas */}
 					<div className="hidden md:block" />
 					{/* Columna derecha con contenido */}
-					<div className="-mt-[250px] space-y-2 text-center md:mt-0 md:space-y-6 md:text-left">
+					<div className="-mt-[185px] space-y-2 text-center md:mt-0 md:space-y-6 md:text-left">
 						<h1 className="text-balance text-2xl font-bold tracking-tight text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)] md:text-6xl">
 							{title}
 						</h1>
@@ -187,7 +186,7 @@ export function HeroParallax({
 						<div className="pt-2 md:pt-6">
 							<a
 								href={`#${scrollToId}`}
-								className="inline-block rounded-full bg-accent-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/40 transition hover:shadow-accent-500/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-500"
+								className="inline-block cursor-pointer rounded-full bg-accent-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent-500/40 transition-colors hover:bg-[#b3333b] hover:shadow-accent-500/60 focus-visible:outline-accent-500"
 							>
 								{ctaText}
 							</a>

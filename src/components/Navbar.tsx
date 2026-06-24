@@ -50,7 +50,7 @@ export function Navbar() {
 					}`}
 			>
 				<div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2 text-xs md:text-sm">
-					<p className="font-medium tracking-wide">San Carlo Acutis Chascomus Argentina 🇦🇷</p>
+					<p className="font-medium tracking-wide">San Carlo Acutis Chascomus Argentina</p>
 					<SocialIcons />
 				</div>
 			</div>
@@ -72,7 +72,7 @@ export function Navbar() {
 				<button
 					type="button"
 					onClick={() => setMobileOpen((prev) => !prev)}
-					className={`inline-flex h-10 w-10 items-center justify-center rounded-full border text-base transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:hidden ${mobileButtonClass}`}
+					className={`inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border text-base transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 md:hidden ${mobileButtonClass}`}
 					aria-expanded={mobileOpen}
 					aria-controls="mobile-nav"
 				>
@@ -105,7 +105,7 @@ export function Navbar() {
 						<Link
 							key={item.href}
 							href={item.href}
-							className={`rounded-full px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${item.active
+							className={`cursor-pointer rounded-full px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 ${item.active
 								? "bg-primary-500 text-white shadow shadow-primary-500/40"
 								: isHome
 									? "text-white/95 hover:bg-black/20 drop-shadow-[0_1px_2px_rgba(0,0,0,0.75)]"
@@ -130,7 +130,7 @@ export function Navbar() {
 								key={item.href}
 								href={item.href}
 								onClick={() => setMobileOpen(false)}
-								className={`rounded-xl px-3 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${item.active ? "bg-primary-500/25" : "hover:bg-primary-500/15"
+								className={`cursor-pointer rounded-xl px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${item.active ? "bg-primary-500/25" : "hover:bg-primary-500/15"
 									}`}
 							>
 								{item.label}
