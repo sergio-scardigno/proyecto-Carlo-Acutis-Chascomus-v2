@@ -1,11 +1,13 @@
 "use client";
 
+import { gaMeasurementId } from "@/components/Ga4";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 declare global {
 	interface Window {
-		dataLayer?: Record<string, unknown>[];
+		dataLayer?: unknown[];
+		gtag?: (...args: unknown[]) => void;
 	}
 }
 
@@ -22,6 +24,12 @@ export function GtmPageView() {
 		window.dataLayer = window.dataLayer ?? [];
 		window.dataLayer.push({
 			event: "page_view",
+			page_path: pagePath,
+			page_title: document.title,
+			page_location: window.location.href,
+		});
+
+		window.gtag?.("config", gaMeasurementId, {
 			page_path: pagePath,
 			page_title: document.title,
 			page_location: window.location.href,

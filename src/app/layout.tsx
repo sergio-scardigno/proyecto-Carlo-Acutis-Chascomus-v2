@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Ga4Script } from "@/components/Ga4";
 import { Footer } from "@/components/Footer";
 import { GtmNoScript, GtmPageViewTracker, GtmScript } from "@/components/Gtm";
 import { Navbar } from "@/components/Navbar";
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
 		<html lang="es">
 			<head>
+				<Ga4Script />
 				<GtmScript />
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
