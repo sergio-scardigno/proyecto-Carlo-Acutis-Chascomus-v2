@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
-import { GtmHead, GtmNoScript } from "@/components/Gtm";
+import { GtmNoScript, GtmPageViewTracker, GtmScript } from "@/components/Gtm";
 import { Navbar } from "@/components/Navbar";
 
 const geistSans = Geist({
@@ -28,10 +28,11 @@ export default function RootLayout({
   return (
 		<html lang="es">
 			<head>
-				<GtmHead />
+				<GtmScript />
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<GtmNoScript />
+				<GtmPageViewTracker />
 				<Navbar />
 				{children}
 				<Footer />
