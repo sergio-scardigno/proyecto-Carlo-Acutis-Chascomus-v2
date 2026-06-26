@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /accounts/
+
+Sitemap: https://carloacutis.net.ar/sitemap.xml
