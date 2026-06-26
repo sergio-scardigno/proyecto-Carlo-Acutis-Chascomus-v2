@@ -22,6 +22,17 @@ const nextConfig: NextConfig = {
             },
           ]
         : []),
+      // Instagram CDN — para imagenes de posts sincronizados via scraper → Directus
+      {
+        protocol: "https",
+        hostname: "*.cdninstagram.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.fbcdn.net",
+        pathname: "/**",
+      },
     ],
   },
 };
