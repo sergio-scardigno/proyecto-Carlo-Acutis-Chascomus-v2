@@ -17,10 +17,9 @@ export async function GET(
     return new Response("DIRECTUS_API_TOKEN no configurado para assets privados.", { status: 500 });
   }
 
-  const assetUrl = new URL(`${DIRECTUS_BASE_URL}/assets/${encodeURIComponent(id)}`);
-  assetUrl.searchParams.set("access_token", DIRECTUS_API_TOKEN);
+  const assetUrl = `${DIRECTUS_BASE_URL}/assets/${encodeURIComponent(id)}`;
 
-  const upstream = await fetch(assetUrl.toString(), {
+  const upstream = await fetch(assetUrl, {
     headers: {
       Authorization: `Bearer ${DIRECTUS_API_TOKEN}`,
     },

@@ -1,7 +1,14 @@
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { InstagramFeed } from "@/components/InstagramFeed";
-import { getInstagramData, type InstagramData } from "@/lib/instagram";
+import {
+  getInstagramPosts,
+  getInstagramProfile,
+  type InstagramPost,
+  type InstagramProfile,
+} from "@/lib/instagram";
+
+export const revalidate = 300;
 
 export const metadata = {
   title: "Instagram | San Carlo Acutis Chascomús",
@@ -14,17 +21,17 @@ function formatNumber(value: number) {
 }
 
 export default async function InstagramPage() {
-  let data: InstagramData | null = null;
+  let profile: InstagramProfile | null = null;
+  let posts: InstagramPost[] = [];
   let hasError = false;
 
   try {
-    data = await getInstagramData();
+    [profile, posts] = await Promise.all([getInstagramProfile(), getInstagramPosts()]);
   } catch {
     hasError = true;
+    profile = null;
+    posts = [];
   }
-
-  const profile = data?.profile;
-  const posts = data?.posts ?? [];
 
   return (
     <main className="page-shell">

@@ -56,7 +56,11 @@ const DIRECTUS_INSTAGRAM_PROFILE_ENDPOINT =
 
 const DIRECTUS_INSTAGRAM_POSTS_ENDPOINT =
   process.env.DIRECTUS_INSTAGRAM_POSTS_ENDPOINT ??
-  "/items/instagram_posts?fields=*&filter[status][_eq]=published&sort=-date_utc";
+  "/items/instagram_posts?fields=*&filter[status][_eq]=published&sort=-date_utc&limit=-1";
+
+const INSTAGRAM_REVALIDATE_SECONDS = 300;
+
+const DIRECTUS_ASSET_ID_RE = /\/assets\/([0-9a-f-]{36})/i;
 
 // ── Fetch helpers ──────────────────────────────────────────────────
 
@@ -76,7 +80,7 @@ async function directusFetch<T>(endpoint: string): Promise<T> {
 
   const res = await fetch(url, {
     headers,
-    next: { revalidate: 3600 }, // ISR: revalidar cada 1 hora
+    next: { revalidate: INSTAGRAM_REVALIDATE_SECONDS },
   });
 
   if (!res.ok) {
@@ -88,6 +92,16 @@ async function directusFetch<T>(endpoint: string): Promise<T> {
 
 // ── Mappers (Directus snake_case → camelCase) ──────────────────────
 
+/** Usa el proxy local para assets de Directus (requieren token). */
+function resolveInstagramMediaUrl(url: string): string {
+  if (!url) return "";
+  const match = url.match(DIRECTUS_ASSET_ID_RE);
+  if (match?.[1]) {
+    return `/api/directus-assets/${match[1]}`;
+  }
+  return url;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapProfile(raw: any): InstagramProfile {
   return {
@@ -95,7 +109,7 @@ function mapProfile(raw: any): InstagramProfile {
     fullName: raw.full_name ?? "",
     biography: raw.biography ?? "",
     profileUrl: raw.profile_url ?? "",
-    profilePicUrl: raw.profile_pic_url ?? "",
+    profilePicUrl: resolveInstagramMediaUrl(raw.profile_pic_url ?? ""),
     isVerified: Boolean(raw.is_verified),
     followers: raw.followers ?? 0,
     following: raw.following ?? 0,
@@ -120,52 +134,45 @@ function mapPost(raw: any): InstagramPost {
     likeCount: raw.like_count ?? 0,
     commentCount: raw.comment_count ?? 0,
     playCount: raw.play_count ?? null,
-    thumbnailUrl: raw.thumbnail_url || imageUrls[0] || "",
-    imageUrls,
+    thumbnailUrl: resolveInstagramMediaUrl(raw.thumbnail_url || imageUrls[0] || ""),
+    imageUrls: imageUrls.map(resolveInstagramMediaUrl),
     embedUrl: raw.embed_url ?? "",
   };
 }
 
 // ── Public API ─────────────────────────────────────────────────────
 
-let cachedData: Promise<InstagramData> | null = null;
-
 export async function getInstagramData(): Promise<InstagramData> {
-  if (!cachedData) {
-    cachedData = (async () => {
-      const [profileRes, postsRes] = await Promise.all([
-        directusFetch<{ data: unknown[] }>(DIRECTUS_INSTAGRAM_PROFILE_ENDPOINT),
-        directusFetch<{ data: unknown[] }>(DIRECTUS_INSTAGRAM_POSTS_ENDPOINT),
-      ]);
+  const [profileRes, postsRes] = await Promise.all([
+    directusFetch<{ data: unknown[] }>(DIRECTUS_INSTAGRAM_PROFILE_ENDPOINT),
+    directusFetch<{ data: unknown[] }>(DIRECTUS_INSTAGRAM_POSTS_ENDPOINT),
+  ]);
 
-      const profileRaw = Array.isArray(profileRes.data) ? profileRes.data[0] : null;
-      const postsRaw = Array.isArray(postsRes.data) ? postsRes.data : [];
+  const profileRaw = Array.isArray(profileRes.data) ? profileRes.data[0] : null;
+  const postsRaw = Array.isArray(postsRes.data) ? postsRes.data : [];
 
-      const profile: InstagramProfile = profileRaw
-        ? mapProfile(profileRaw)
-        : {
-            username: "sancarloacutischascomus",
-            fullName: "",
-            biography: "",
-            profileUrl: "https://www.instagram.com/sancarloacutischascomus/",
-            profilePicUrl: "",
-            isVerified: false,
-            followers: 0,
-            following: 0,
-            totalPosts: 0,
-          };
-
-      const posts: InstagramPost[] = postsRaw.map(mapPost);
-
-      return {
-        profile,
-        availablePosts: posts.length,
-        generatedAt: new Date().toISOString(),
-        posts,
+  const profile: InstagramProfile = profileRaw
+    ? mapProfile(profileRaw)
+    : {
+        username: "sancarloacutischascomus",
+        fullName: "",
+        biography: "",
+        profileUrl: "https://www.instagram.com/sancarloacutischascomus/",
+        profilePicUrl: "",
+        isVerified: false,
+        followers: 0,
+        following: 0,
+        totalPosts: 0,
       };
-    })();
-  }
-  return cachedData;
+
+  const posts: InstagramPost[] = postsRaw.map(mapPost);
+
+  return {
+    profile,
+    availablePosts: posts.length,
+    generatedAt: new Date().toISOString(),
+    posts,
+  };
 }
 
 export async function getInstagramProfile(): Promise<InstagramProfile> {
