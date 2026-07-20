@@ -9,6 +9,7 @@ import { FeatureCard } from "@/components/FeatureCard";
 import { NovedadHomeCard } from "@/components/NovedadHomeCard";
 import { ContactForm } from "@/components/ContactForm";
 import { InstagramHomeSection } from "@/components/InstagramHomeSection";
+import { HistoriaAcutis } from "@/components/HistoriaAcutis";
 import {
   getInstagramProfile,
   getInstagramPostsPreview,
@@ -116,6 +117,8 @@ export default async function Home() {
       <div id="sections" className="page-shell">
         <div className="page-content grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-12">
           <div>
+            <HistoriaAcutis />
+
             <Section
               id="sobre"
               title="Sobre el proyecto"
