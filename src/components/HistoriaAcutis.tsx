@@ -88,8 +88,8 @@ export function HistoriaAcutis() {
         </ul>
 
         <p className="mt-8 text-base leading-relaxed text-primary-600">
-          Su fiesta se celebra el <strong className="text-primary-700">12 de octubre</strong>,
-          y es reconocido como patrono de internet y de los jóvenes.
+          Fecha litúrgica: <strong className="text-primary-700">12 de octubre</strong>, y es
+          reconocido como patrono de internet y de los jóvenes.
         </p>
       </div>
     </Section>

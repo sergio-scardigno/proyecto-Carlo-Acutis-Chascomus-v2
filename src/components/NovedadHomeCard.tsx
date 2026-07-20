@@ -47,7 +47,7 @@ export function NovedadHomeCard({ novedad }: NovedadHomeCardProps) {
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <Image
-              src="/img/logo/logo.png"
+              src="/img/logo/logo.webp"
               alt="Misión San Carlo Acutis"
               width={120}
               height={120}

@@ -8,7 +8,7 @@ export function Footer() {
 			<div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
 				<div>
 					<Image
-						src="/img/logo/logo.png"
+						src="/img/logo/logo.webp"
 						alt="Misión San Carlo Acutis"
 						width={400}
 						height={400}
@@ -82,7 +82,7 @@ export function Footer() {
 						>
 							<span className="block">
 								<Image
-									src="/img/programmer.png"
+									src="/img/programmer.webp"
 									alt="Ilustración de programador: desarrollado por Sergio Scardigno"
 									width={40}
 									height={40}
@@ -93,7 +93,7 @@ export function Footer() {
 					</div>
 					<div className="flex items-center gap-2">
 						<Image
-							src="/img/fibra.png"
+							src="/img/fibra.webp"
 							width={100}
 							height={100}
 							alt="Logo de Fibra TV, impulsor de Misión San Carlo Acutis Chascomús"

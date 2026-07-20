@@ -33,7 +33,7 @@ const novenaDays: NovenaDay[] = [
 		quote: "No yo, sino Dios.",
 		reflection: "Santo Carlo Acutis, que has hecho de tu vida una continua renuncia y anonadamiento...",
 		prayer: commonRosaryText,
-		image: "/img/oracion/primer_dia.jpg",
+		image: "/img/oracion/primer_dia.webp",
 		imageAlt: "Meditacion del primer dia de la novena al Santo Carlo Acutis",
 	},
 	{
@@ -42,7 +42,7 @@ const novenaDays: NovenaDay[] = [
 		quote: "Estar siempre unido a Jesus, he aqui mi programa de vida.",
 		reflection: "Santo Carlo Acutis, que has vivido siempre unido al Corazon de Jesus...",
 		prayer: commonRosaryText,
-		image: "/img/oracion/segundo_dia.jpg",
+		image: "/img/oracion/segundo_dia.webp",
 		imageAlt: "Meditacion del segundo dia de la novena al Santo Carlo Acutis",
 	},
 	{
@@ -54,7 +54,7 @@ const novenaDays: NovenaDay[] = [
 		reflection:
 			"Santo Carlo Acutis, que has buscado, ya en este mundo, la compania de los Santos Angeles, alcanzame la gracia de vivir con rectitud, como te lo inspiro tu Angel. Amen.",
 		prayer: commonRosaryText,
-		image: "/img/oracion/tercer_dia.jpg",
+		image: "/img/oracion/tercer_dia.webp",
 		imageAlt: "Meditacion del tercer dia de la novena al Santo Carlo Acutis",
 	},
 	{
@@ -66,7 +66,7 @@ const novenaDays: NovenaDay[] = [
 		reflection:
 			"Santo Carlo Acutis, que has vivido tan bien este Sacramento de la Reconciliacion, alcanzame la gracia de acercarme con frecuencia a la confesion con un arrepentimiento profundo. Amen.",
 		prayer: commonRosaryText,
-		image: "/img/oracion/cuarto_dia.jpg",
+		image: "/img/oracion/cuarto_dia.webp",
 		imageAlt: "Meditacion del cuarto dia de la novena al Santo Carlo Acutis",
 	},
 	{
@@ -77,7 +77,7 @@ const novenaDays: NovenaDay[] = [
 		reflection:
 			"Santo Carlo Acutis, que nunca has apartado la mirada de Jesus, tu gran amor, alcanzame la gracia de vivir ya en este mundo esta felicidad autentica. Amen.",
 		prayer: commonRosaryText,
-		image: "/img/oracion/quinto_dia.jpg",
+		image: "/img/oracion/quinto_dia.webp",
 		imageAlt: "Meditacion del quinto dia de la novena al Santo Carlo Acutis",
 	},
 	{
@@ -87,7 +87,7 @@ const novenaDays: NovenaDay[] = [
 		reflection:
 			"Santo Carlo Acutis, que siempre has sabido pedir a Dios lo esencial, alcanzame la gracia de un profundo deseo del Cielo. Amen.",
 		prayer: commonRosaryText,
-		image: "/img/oracion/sexto_dia.jpg",
+		image: "/img/oracion/sexto_dia.webp",
 		imageAlt: "Meditacion del sexto dia de la novena al Santo Carlo Acutis",
 	},
 	{
@@ -97,7 +97,7 @@ const novenaDays: NovenaDay[] = [
 		reflection:
 			"Santo Carlo Acutis, que has amado a la Virgen Maria mas que a nadie, alcanzame la gracia de responder siempre al amor de esta Madre tan dulce y tan buena. Amen.",
 		prayer: commonRosaryText,
-		image: "/img/oracion/septimo_dia.jpg",
+		image: "/img/oracion/septimo_dia.webp",
 		imageAlt: "Meditacion del septimo dia de la novena al Santo Carlo Acutis",
 	},
 	{
@@ -107,7 +107,7 @@ const novenaDays: NovenaDay[] = [
 		reflection:
 			"Santo Carlo Acutis, que buscabas siempre a tu Jesus oculto en el Sagrario, alcanzame la gracia de un profundo fervor eucaristico. Amen.",
 		prayer: commonRosaryText,
-		image: "/img/oracion/octavo_dia.jpg",
+		image: "/img/oracion/octavo_dia.webp",
 		imageAlt: "Meditacion del octavo dia de la novena al Santo Carlo Acutis",
 	},
 	{
@@ -119,7 +119,7 @@ const novenaDays: NovenaDay[] = [
 		reflection:
 			"Santo Carlo Acutis, alcanzame la gracia de las gracias, o sea la perseverancia final y una muerte santa. Amen.",
 		prayer: commonRosaryText,
-		image: "/img/oracion/noveno_dia.jpg",
+		image: "/img/oracion/noveno_dia.webp",
 		imageAlt: "Meditacion del noveno dia de la novena al Santo Carlo Acutis",
 	},
 ];

@@ -62,7 +62,7 @@ export function Navbar() {
 					className="flex items-center"
 				>
 					<Image
-						src="/img/logo/logo.png"
+						src="/img/logo/logo.webp"
 						alt="Misión San Carlo Acutis"
 						width={400}
 						height={400}

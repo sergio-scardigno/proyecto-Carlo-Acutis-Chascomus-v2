@@ -64,7 +64,7 @@ export default async function Home() {
         subtitle="Bienvenidos a la web"
         layers={[
           {
-            src: "/parallax/catedral.png",
+            src: "/parallax/catedral.webp",
             speed: 0.12,
             opacity: 1,
             size: "cover",
@@ -72,7 +72,7 @@ export default async function Home() {
             className: "",
           },
           {
-            src: "/parallax/arbustos.png",
+            src: "/parallax/arbustos.webp",
             speed: 0.24,
             opacity: 1,
             size: "cover",
@@ -80,7 +80,7 @@ export default async function Home() {
             className: "",
           },
           {
-            src: "/parallax/carlos-acutis.png",
+            src: "/parallax/carlos-acutis.webp",
             speed: 0.38,
             opacity: 1,
             size: "contain",
@@ -90,21 +90,21 @@ export default async function Home() {
         ]}
         mobileLayers={[
           {
-            src: "/parallax/movil/catedral.png",
+            src: "/parallax/movil/catedral.webp",
             speed: 0.18,
             opacity: 1,
             size: "cover",
             position: "center",
           },
           {
-            src: "/parallax/movil/arbustos.png",
+            src: "/parallax/movil/arbustos.webp",
             speed: 0.35,
             opacity: 1,
             size: "cover",
             position: "center 95%",
           },
           {
-            src: "/parallax/movil/carlos-acutis.png",
+            src: "/parallax/movil/carlos-acutis.webp",
             speed: 0.55,
             opacity: 1,
             size: "cover",
@@ -130,7 +130,7 @@ export default async function Home() {
                   title="Novena"
                   desc="Reza la novena al Santo Carlo Acutis: oración inicial, meditaciones diarias y oración final."
                   href="/novena"
-                  image="/img/oracion/primer_dia.jpg"
+                  image="/img/oracion/primer_dia.webp"
                   imageAlt="Novena al Santo Carlo Acutis"
                   cta="Rezar la novena"
                   icon={
@@ -146,7 +146,7 @@ export default async function Home() {
                     title="Novedades"
                     desc="Artículos, noticias y reflexiones del proyecto."
                     href="/blog"
-                    image="/img/chascomus/carlo-acutis-chascomus.jpg"
+                    image="/img/chascomus/carlo-acutis-chascomus.webp"
                     imageAlt="Novedades del proyecto"
                     cta="Ver novedades"
                     icon={
@@ -160,7 +160,7 @@ export default async function Home() {
                   title="Entronizaciones"
                   desc="Guía, testimonios e imágenes de las entronizaciones realizadas."
                   href="/entronizaciones"
-                  image="/img/entronacion.jpg"
+                  image="/img/entronacion.webp"
                   imageAlt="Entronizaciones del Santo Carlo Acutis"
                   cta="Ver entronizaciones"
                   icon={
@@ -176,7 +176,7 @@ export default async function Home() {
                     title="Misiones"
                     desc="Conoce nuestras misiones de evangelización en todo el país."
                     href="/misiones"
-                    image="/img/chascomus/carlo-acutis-chascomus.jpg"
+                    image="/img/chascomus/carlo-acutis-chascomus.webp"
                     imageAlt="Misiones de evangelización"
                     cta="Ver misiones"
                     icon={
