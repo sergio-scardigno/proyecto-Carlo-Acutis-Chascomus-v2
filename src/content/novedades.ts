@@ -32,7 +32,7 @@ export const novedades: NovedadInput[] = [
     titulo: "¡Carlo Acutis ya es santo!",
     contenido: "La Iglesia Católica celebra el primer milenial canonizado. Un día histórico en la Plaza de San Pedro, donde el Papa León XIV presidió la ceremonia.",
     imagenes: [
-      "/img/canonizacion/canonizacion-carlo.jpg",
+      "/img/canonizacion/canonizacion-carlo.webp",
     ],
   },
 ];

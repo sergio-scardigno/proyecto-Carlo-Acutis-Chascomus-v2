@@ -156,10 +156,10 @@ export const entronizaciones: EntronizacionInput[] = [
       "",
     ].join("\n\n"),
     imagenes: [
-      "/img/entronizaciones/chascomus/entronizacion-iglesia-lujan-chascomus-3.jpg",
-      "/img/entronizaciones/chascomus/entronizacion-iglesia-lujan-chascomus-2.jpg",
-      "/img/entronizaciones/chascomus/entronizacion-iglesia-lujan-chascomus-4.jpg",
-      "/img/entronizaciones/chascomus/entronizacion-iglesia-lujan-chascomus-1.jpg",
+      "/img/entronizaciones/chascomus/entronizacion-iglesia-lujan-chascomus-3.webp",
+      "/img/entronizaciones/chascomus/entronizacion-iglesia-lujan-chascomus-2.webp",
+      "/img/entronizaciones/chascomus/entronizacion-iglesia-lujan-chascomus-4.webp",
+      "/img/entronizaciones/chascomus/entronizacion-iglesia-lujan-chascomus-1.webp",
     ],
   },
 ];
