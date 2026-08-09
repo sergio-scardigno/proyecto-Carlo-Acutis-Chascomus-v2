@@ -1,12 +1,25 @@
 /**
- * Instagram data layer — lee desde Directus CMS.
+ * Instagram data layer — lee desde NocoDB.
  *
- * El scraper Python (scrapper-ig-carlos-acutis/scraper.py) sincroniza @sancarloacutischascomus
- * hacia las colecciones `instagram_profile` (singleton) y `instagram_posts` de Directus,
- * subiendo las imagenes a Directus Files para URLs estables.
+ * Es la unica seccion dinamica del sitio: el resto del contenido es estatico.
+ * El scraper sincroniza @sancarloacutischascomus hacia las tablas
+ * `instagram_profile` e `instagram_posts`.
  *
- * Next.js usa ISR (revalidate) para refrescar cada cierto tiempo sin redeploy.
+ * Las miniaturas se guardan como adjunto en NocoDB (columna `thumbnail`), porque
+ * las URLs del CDN de Instagram caducan. La foto completa la sigue sirviendo el
+ * embed de Instagram dentro del modal (ver `InstagramEmbedModal`).
  */
+
+import {
+  buildAttachmentUrl,
+  getRecordId,
+  isNocodbConfigured,
+  listRecords,
+  pickStringValue,
+  pickValue,
+  toBooleanFlag,
+  type JsonObject,
+} from "@/lib/nocodb";
 
 export type InstagramMediaType = "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
 
@@ -21,8 +34,8 @@ export type InstagramPost = {
   likeCount: number;
   commentCount: number;
   playCount: number | null;
+  /** Miniatura alojada en NocoDB. Vacia si el scraper todavia no la subio. */
   thumbnailUrl: string;
-  imageUrls: string[];
   embedUrl: string;
 };
 
@@ -31,7 +44,6 @@ export type InstagramProfile = {
   fullName: string;
   biography: string;
   profileUrl: string;
-  profilePicUrl: string;
   isVerified: boolean;
   followers: number;
   following: number;
@@ -47,125 +59,119 @@ export type InstagramData = {
 
 // ── Config ─────────────────────────────────────────────────────────
 
-const DIRECTUS_BASE_URL = process.env.DIRECTUS_BASE_URL ?? "";
-const DIRECTUS_API_TOKEN = process.env.DIRECTUS_API_TOKEN ?? "";
+const TABLE_PROFILE = process.env.NOCODB_TABLE_INSTAGRAM_PROFILE ?? "instagram_profile";
+const TABLE_POSTS = process.env.NOCODB_TABLE_INSTAGRAM_POSTS ?? "instagram_posts";
 
-const DIRECTUS_INSTAGRAM_PROFILE_ENDPOINT =
-  process.env.DIRECTUS_INSTAGRAM_PROFILE_ENDPOINT ??
-  "/items/instagram_profile?limit=1";
+const DEFAULT_USERNAME = "sancarloacutischascomus";
 
-const DIRECTUS_INSTAGRAM_POSTS_ENDPOINT =
-  process.env.DIRECTUS_INSTAGRAM_POSTS_ENDPOINT ??
-  "/items/instagram_posts?fields=*&filter[status][_eq]=published&sort=-date_utc&limit=-1";
+const FALLBACK_PROFILE: InstagramProfile = {
+  username: DEFAULT_USERNAME,
+  fullName: "",
+  biography: "",
+  profileUrl: `https://www.instagram.com/${DEFAULT_USERNAME}/`,
+  isVerified: false,
+  followers: 0,
+  following: 0,
+  totalPosts: 0,
+};
 
-const INSTAGRAM_REVALIDATE_SECONDS = 300;
+// ── Mappers (NocoDB → camelCase) ───────────────────────────────────
 
-const DIRECTUS_ASSET_ID_RE = /\/assets\/([0-9a-f-]{36})/i;
-
-// ── Fetch helpers ──────────────────────────────────────────────────
-
-type DirectusResponse<T> = { data: T };
-
-async function directusFetch<T>(endpoint: string): Promise<T> {
-  if (!DIRECTUS_BASE_URL) {
-    throw new Error("DIRECTUS_BASE_URL no configurada");
-  }
-
-  const url = `${DIRECTUS_BASE_URL}${endpoint}`;
-  const headers: Record<string, string> = {};
-
-  if (DIRECTUS_API_TOKEN) {
-    headers["Authorization"] = `Bearer ${DIRECTUS_API_TOKEN}`;
-  }
-
-  const res = await fetch(url, {
-    headers,
-    next: { revalidate: INSTAGRAM_REVALIDATE_SECONDS },
-  });
-
-  if (!res.ok) {
-    throw new Error(`Directus API error: ${res.status} ${res.statusText}`);
-  }
-
-  return res.json();
+function toNumber(value: unknown, fallback = 0): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-// ── Mappers (Directus snake_case → camelCase) ──────────────────────
+function mapProfile(record: JsonObject): InstagramProfile {
+  const username = pickStringValue(record, ["username", "user_name"]) || DEFAULT_USERNAME;
 
-/** Usa el proxy local para assets de Directus (requieren token). */
-function resolveInstagramMediaUrl(url: string): string {
-  if (!url) return "";
-  const match = url.match(DIRECTUS_ASSET_ID_RE);
-  if (match?.[1]) {
-    return `/api/directus-assets/${match[1]}`;
-  }
-  return url;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapProfile(raw: any): InstagramProfile {
   return {
-    username: raw.username ?? "",
-    fullName: raw.full_name ?? "",
-    biography: raw.biography ?? "",
-    profileUrl: raw.profile_url ?? "",
-    profilePicUrl: resolveInstagramMediaUrl(raw.profile_pic_url ?? ""),
-    isVerified: Boolean(raw.is_verified),
-    followers: raw.followers ?? 0,
-    following: raw.following ?? 0,
-    totalPosts: raw.total_posts ?? 0,
+    username,
+    fullName: pickStringValue(record, ["full_name", "fullname", "nombre"]),
+    biography: pickStringValue(record, ["biography", "bio"]),
+    profileUrl:
+      pickStringValue(record, ["profile_url", "profileurl"]) ||
+      `https://www.instagram.com/${username}/`,
+    isVerified: toBooleanFlag(pickValue(record, ["is_verified", "verified"]), false),
+    followers: toNumber(pickValue(record, ["followers"])),
+    following: toNumber(pickValue(record, ["following"])),
+    totalPosts: toNumber(pickValue(record, ["total_posts", "posts_count"])),
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapPost(raw: any): InstagramPost {
-  const imageUrls = Array.isArray(raw.image_urls)
-    ? raw.image_urls.filter((url: unknown): url is string => typeof url === "string" && url.length > 0)
-    : [];
+function mapPost(record: JsonObject): InstagramPost {
+  const code = pickStringValue(record, ["code", "shortcode"]);
+  const title = pickStringValue(record, ["title", "titulo"]);
+  const playCountRaw = pickValue(record, ["play_count"]);
 
   return {
-    code: raw.code ?? "",
-    permalink: raw.permalink ?? "",
-    dateUtc: raw.date_utc ?? "",
-    mediaType: (raw.media_type as InstagramMediaType) ?? "IMAGE",
-    title: raw.title ?? "",
-    summary: raw.summary ?? raw.title ?? "",
-    caption: raw.caption ?? "",
-    likeCount: raw.like_count ?? 0,
-    commentCount: raw.comment_count ?? 0,
-    playCount: raw.play_count ?? null,
-    thumbnailUrl: resolveInstagramMediaUrl(raw.thumbnail_url || imageUrls[0] || ""),
-    imageUrls: imageUrls.map(resolveInstagramMediaUrl),
-    embedUrl: raw.embed_url ?? "",
+    code,
+    permalink:
+      pickStringValue(record, ["permalink", "url"]) ||
+      (code ? `https://www.instagram.com/p/${code}/` : ""),
+    dateUtc: pickStringValue(record, ["date_utc", "date", "fecha"]),
+    mediaType: (pickStringValue(record, ["media_type"]) || "IMAGE") as InstagramMediaType,
+    title,
+    summary: pickStringValue(record, ["summary", "resumen"]) || title,
+    caption: pickStringValue(record, ["caption", "texto"]),
+    likeCount: toNumber(pickValue(record, ["like_count", "likes"])),
+    commentCount: toNumber(pickValue(record, ["comment_count", "comments"])),
+    playCount: playCountRaw === undefined ? null : toNumber(playCountRaw),
+    thumbnailUrl: buildAttachmentUrl(pickValue(record, ["thumbnail", "imagen"])),
+    embedUrl:
+      pickStringValue(record, ["embed_url"]) ||
+      (code ? `https://www.instagram.com/p/${code}/embed` : ""),
   };
+}
+
+/**
+ * La tabla de perfil acumula un snapshot por corrida del scraper, asi que nos
+ * quedamos con el mas reciente en vez de con la primera fila.
+ */
+function pickLatestProfile(rows: JsonObject[]): JsonObject | undefined {
+  return rows.reduce<JsonObject | undefined>((latest, row) => {
+    if (!latest) return row;
+    const current = pickStringValue(row, ["updated_at", "date_updated", "date_created"]);
+    const best = pickStringValue(latest, ["updated_at", "date_updated", "date_created"]);
+    if (current && best) return current > best ? row : latest;
+    return getRecordId(row) > getRecordId(latest) ? row : latest;
+  }, undefined);
+}
+
+function isPublished(record: JsonObject): boolean {
+  const status = pickStringValue(record, ["status", "estado"]).toLowerCase();
+  if (status) return status === "published" || status === "active";
+  return toBooleanFlag(pickValue(record, ["publicado", "published"]), true);
 }
 
 // ── Public API ─────────────────────────────────────────────────────
 
+const EMPTY_DATA: InstagramData = {
+  profile: FALLBACK_PROFILE,
+  availablePosts: 0,
+  generatedAt: "",
+  posts: [],
+};
+
 export async function getInstagramData(): Promise<InstagramData> {
-  const [profileRes, postsRes] = await Promise.all([
-    directusFetch<{ data: unknown[] }>(DIRECTUS_INSTAGRAM_PROFILE_ENDPOINT),
-    directusFetch<{ data: unknown[] }>(DIRECTUS_INSTAGRAM_POSTS_ENDPOINT),
+  // Sin credenciales no hay nada que traer: un clone limpio no deberia romper el build.
+  if (!isNocodbConfigured()) {
+    return { ...EMPTY_DATA, generatedAt: new Date().toISOString() };
+  }
+
+  const [profileRows, postRows] = await Promise.all([
+    listRecords(TABLE_PROFILE),
+    listRecords(TABLE_POSTS),
   ]);
 
-  const profileRaw = Array.isArray(profileRes.data) ? profileRes.data[0] : null;
-  const postsRaw = Array.isArray(postsRes.data) ? postsRes.data : [];
+  const latestProfile = pickLatestProfile(profileRows);
+  const profile = latestProfile ? mapProfile(latestProfile) : FALLBACK_PROFILE;
 
-  const profile: InstagramProfile = profileRaw
-    ? mapProfile(profileRaw)
-    : {
-        username: "sancarloacutischascomus",
-        fullName: "",
-        biography: "",
-        profileUrl: "https://www.instagram.com/sancarloacutischascomus/",
-        profilePicUrl: "",
-        isVerified: false,
-        followers: 0,
-        following: 0,
-        totalPosts: 0,
-      };
-
-  const posts: InstagramPost[] = postsRaw.map(mapPost);
+  const posts = postRows
+    .filter(isPublished)
+    .map(mapPost)
+    .filter((post) => post.code)
+    .sort((a, b) => (a.dateUtc < b.dateUtc ? 1 : a.dateUtc > b.dateUtc ? -1 : 0));
 
   return {
     profile,

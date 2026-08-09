@@ -10,8 +10,9 @@ type InstagramFeedProps = {
   className?: string;
 };
 
+// Una sola columna en mobile: las cards son de texto y a dos columnas quedan ilegibles.
 const DEFAULT_GRID =
-  "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4";
+  "grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3";
 
 export function InstagramFeed({ posts, className }: InstagramFeedProps) {
   const [selected, setSelected] = useState<InstagramPost | null>(null);

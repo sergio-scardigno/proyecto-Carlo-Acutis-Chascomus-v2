@@ -4,8 +4,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { SurfaceCard } from "@/components/SurfaceCard";
 import { getMisiones } from "@/lib/content";
 
-export const revalidate = 0;
-
 function formatDate(value: string) {
   if (!value) return "";
   const date = new Date(value);

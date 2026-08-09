@@ -26,15 +26,17 @@ export function FeaturedVideoCard({ video }: FeaturedVideoCardProps) {
   return (
     <>
       <article className="surface-card rounded-2xl p-4 md:p-5">
-        <div className="relative h-44 w-full overflow-hidden rounded-xl">
-          <Image
-            src={video.thumbnailUrl}
-            alt={`Vista previa de ${video.titulo}`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            unoptimized
-          />
+        <div className="relative h-44 w-full overflow-hidden rounded-xl bg-primary-500/10">
+          {video.thumbnailUrl ? (
+            <Image
+              src={video.thumbnailUrl}
+              alt={`Vista previa de ${video.titulo}`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              unoptimized
+            />
+          ) : null}
         </div>
 
         <h3 className="mt-4 text-lg font-semibold text-primary-700">{video.titulo}</h3>

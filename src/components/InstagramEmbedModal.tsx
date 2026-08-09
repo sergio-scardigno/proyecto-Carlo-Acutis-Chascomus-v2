@@ -52,11 +52,12 @@ export function InstagramEmbedModal({ post, onClose }: InstagramEmbedModalProps)
         className="flex w-full max-w-[400px] flex-col items-center"
         onClick={(event) => event.stopPropagation()}
       >
+        {/* Es el unico lugar del sitio donde se ve la foto del post. */}
         <iframe
           key={post.code}
           src={post.embedUrl}
           title={post.title || "Publicación de Instagram"}
-          className="h-[640px] max-h-[85vh] w-full rounded-2xl border-0 bg-white"
+          className="h-[720px] max-h-[85vh] w-full rounded-2xl border-0 bg-white"
           loading="lazy"
           allow="autoplay; encrypted-media; picture-in-picture"
           allowFullScreen
