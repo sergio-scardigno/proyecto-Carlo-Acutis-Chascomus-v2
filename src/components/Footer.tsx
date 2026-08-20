@@ -71,26 +71,7 @@ export function Footer() {
 				</div>
 			</div>
 			<div className="border-t border-white/15 bg-white/95 text-primary-700">
-				<div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 md:flex-row md:items-center md:justify-between">
-					<div className="flex items-center">
-						<a
-							href="https://cv-sergio-scardigno.vercel.app/"
-							target="_blank"
-							rel="noopener noreferrer"
-							aria-label="Diseño y desarrollo por Sergio Scardigno"
-							className="cursor-pointer rounded-lg p-1 transition-colors hover:bg-primary-700/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-						>
-							<span className="block">
-								<Image
-									src="/img/programmer.webp"
-									alt="Ilustración de programador: desarrollado por Sergio Scardigno"
-									width={40}
-									height={40}
-									className="rounded-lg"
-								/>
-							</span>
-						</a>
-					</div>
+				<div className="mx-auto flex max-w-6xl items-center px-4 py-5">
 					<div className="flex items-center gap-2">
 						<Image
 							src="/img/fibra.webp"
